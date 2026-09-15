@@ -1,0 +1,22 @@
+{
+   "days": [
+      {
+         "date": "29.08.2026",
+         "times": [
+            {
+               "time": "19:00",
+               "events": [
+                  {
+                     "title": "Gebetsstunde",
+                     "notes": "SH + ST"
+                  },
+                  {
+                     "title": "Kinderstunde",
+                     "notes": "SH + ST"
+                  }
+               ]
+            }
+         ]
+      }
+   ]
+}
