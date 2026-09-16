@@ -1,4 +1,4 @@
-<html class="rootHTML">
+﻿<html class="rootHTML">
 <div id="container-days">
     <div id="day" class="daybox">
 
@@ -294,7 +294,7 @@
                 if (i === 0) {
                     const todayStr = formatDateDot(new Date());
                     if (dayObj.date === todayStr) {
-                        clone.classList.add('day--today');
+                        clone.style.fontWeight = 'bold';
                     }
                 }
 

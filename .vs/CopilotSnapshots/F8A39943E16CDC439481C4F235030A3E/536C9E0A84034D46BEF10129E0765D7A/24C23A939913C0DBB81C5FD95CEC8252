@@ -1,6 +1,6 @@
-<html class="rootHTML">
+﻿<html class="rootHTML">
 <div id="container-days">
-    <div id="day" class="daybox">
+    <div id="day-today" class="daybox">
 
         <!-- Linker Bereich: Wochentag und Datum -->
         <div id="day-info" class="day-info">
@@ -80,11 +80,6 @@
         align-items: flex-start;
     }
 
-    /* Utility: aktueller Tag - Fettformatierung */
-    .daybox.day--today {
-        font-weight: bold;
-    }
-
     /* Container: Links Uhrzeit, Rechts Events */
     .day-info {
         display: flex;
@@ -151,14 +146,11 @@
         // Wenn jsonTestData ein leerer String ist, wird die JSON per URL geladen.
         // Ansonsten wird der Inhalt von jsonTestData benutzt (Roh-JSON).
         const jsonUrl = "https://macdeveloping.github.io/1NF0P01N7/wochenuebersicht.json";
-
-        // hier für Tests Rohdaten einfügen
-        let jsonTestData = ''; 
-        const showDaysCount = 20; // wie viele Tage geprüft werden
-        const refreshInterval = 0.2; // Minuten für automatischen Reload (1 = 1 Minute)
+        let jsonTestData = ""; // hier für Tests Rohdaten einfügen
+        const showDaysCount = 10; // wie viele Tage geprüft werden
 
         // Template-Elemente (werden als Vorlage verwendet)
-        const originalTemplate = document.getElementById("day");
+        const originalTemplate = document.getElementById("day-today");
         const originalTimeEvent = originalTemplate.querySelector(".time-event");
         const originalEvent = originalTemplate.querySelector(".event");
 
@@ -255,7 +247,7 @@
                         timeClone.querySelectorAll('[id]').forEach(el => el.removeAttribute('id'));
                         const timeEl = timeClone.querySelector('.time');
                         const containerEvents = timeClone.querySelector('.container-events');
-                        if (timeEl) timeEl.textContent = (timeObj.time || '') + (timeObj.time ? ' Uhr' : '');
+                        if (timeEl) timeEl.textContent = timeObj.time || '';
                         containerEvents.innerHTML = '';
 
                         if (Array.isArray(timeObj.events)) {
@@ -274,30 +266,6 @@
                     });
                 }
 
-                // Sonderfall: Wenn nur eine Uhrzeit und ein Event ohne Beschreibung vorhanden sind,
-                // dann die Inhalte der daybox zentrieren.
-                let centerAlign = false;
-                if (Array.isArray(dayObj.times) && dayObj.times.length === 1) {
-                    const t = dayObj.times[0];
-                    if (Array.isArray(t.events) && t.events.length === 1) {
-                        const e = t.events[0];
-                        if (!e.notes || String(e.notes).trim() === '') centerAlign = true;
-                    }
-                }
-
-                if (centerAlign) {
-                    clone.style.alignItems = 'center';
-                }
-
-                // Falls der erste dargestellte Tag (oberste Box) dem aktuellen Tag entspricht,
-                // Schrift fett darstellen.
-                if (i === 0) {
-                    const todayStr = formatDateDot(new Date());
-                    if (dayObj.date === todayStr) {
-                        clone.classList.add('day--today');
-                    }
-                }
-
                 container.appendChild(clone);
             }
         }
@@ -310,9 +278,10 @@
                 lastData = data;
                 renderFromData(data);
 
-                // Refresh-Intervall (konfiguriert durch refreshInterval)
-                if (refreshInterval && Number(refreshInterval) > 0) {
-                    const ms = Number(refreshInterval) * 60 * 1000;
+                // Refresh-Intervall setzen (falls angegeben)
+                if (data.refresh && Number(data.refresh) > 0) {
+                    const minutes = Number(data.refresh);
+                    const ms = minutes * 60 * 1000;
                     if (refreshTimerId) clearInterval(refreshTimerId);
                     refreshTimerId = setInterval(async () => {
                         const newData = await loadJson();

@@ -1,4 +1,4 @@
-<html class="rootHTML">
+﻿<html class="rootHTML">
 <div id="container-days">
     <div id="day" class="daybox">
 
@@ -78,11 +78,6 @@
         flex-direction: row;
         flex-wrap: nowrap;
         align-items: flex-start;
-    }
-
-    /* Utility: aktueller Tag - Fettformatierung */
-    .daybox.day--today {
-        font-weight: bold;
     }
 
     /* Container: Links Uhrzeit, Rechts Events */
@@ -294,7 +289,7 @@
                 if (i === 0) {
                     const todayStr = formatDateDot(new Date());
                     if (dayObj.date === todayStr) {
-                        clone.classList.add('day--today');
+                        clone.style.fontWeight = 'bold';
                     }
                 }
 
