@@ -1,128 +1,142 @@
 {
-   "days": [
-      {
-         "date": "11.09.2026",
-         "times": [
+  "days": [
+    {
+      "date": "11.09.2026",
+      "times": [
+        {
+          "time": "18:00",
+          "events": [
             {
-               "time": "18:00",
-               "events": [
-                  {
-                     "title": "Gebetsstunde",
-                     "notes": ""
-                  },
-                  {
-                     "title": "Kinderstunden",
-                     "notes": ""
-                  }
-               ]
-            }
-         ]
-      },
-      {
-         "date": "13.09.2026",
-         "times": [
-            {
-               "time": "10:00",
-               "events": [
-                  {
-                     "title": "Gottesdienst",
-                     "notes": "Schloss Holte & Stukenbrock"
-                  }
-               ]
+              "title": "Gebetsstunde",
+              "notes": ""
             },
             {
-               "time": "16:00",
-               "events": [
-                  {
-                     "title": "Gottesdienst",
-                     "notes": "Schloss Holte"
-                  }
-               ]
+              "title": "Kinderstunden",
+              "notes": ""
             }
-         ]
-      },
-      {
-         "date": "14.09.2026",
-         "times": [
+          ]
+        }
+      ]
+    },
+    {
+      "date": "13.09.2026",
+      "times": [
+        {
+          "time": "10:00",
+          "events": [
             {
-               "time": "10:00",
-               "events": [
-                  {
-                     "title": "Gebetskreis",
-                     "notes": ""
-                  }
-               ]
+              "title": "Gottesdienst",
+              "notes": "Schloss Holte & Stukenbrock"
             }
-         ]
-      },
-      {
-         "date": "16.09.2026",
-         "times": [
+          ]
+        },
+        {
+          "time": "16:00",
+          "events": [
             {
-               "time": "19:00",
-               "events": [
-                  {
-                     "title": "Bibelstunde",
-                     "notes": "Stukenbrock"
-                  }
-               ]
+              "title": "Gottesdienst",
+              "notes": "Schloss Holte"
             }
-         ]
-      },
-      {
-         "date": "17.09.2026",
-         "times": [
+          ]
+        }
+      ]
+    },
+    {
+      "date": "14.09.2026",
+      "times": [
+        {
+          "time": "10:00",
+          "events": [
             {
-               "time": "19:00",
-               "events": [
-                  {
-                     "title": "Schwesterngebetskreis",
-                     "notes": ""
-                  }
-               ]
+              "title": "Gebetskreis",
+              "notes": ""
             }
-         ]
-      },
-      {
-         "date": "18.09.2026",
-         "times": [
+          ]
+        }
+      ]
+    },
+    {
+      "date": "16.09.2026",
+      "times": [
+        {
+          "time": "19:00",
+          "events": [
             {
-               "time": "18:00",
-               "events": [
-                  {
-                     "title": "Gebetsstunde &",
-                     "notes": ""
-                  },
-                  {
-                     "title": "Kinderstunden",
-                     "notes": ""
-                  }
-               ]
+              "title": "Bibelstunde",
+              "notes": "Stukenbrock"
             }
-         ]
-      },
-      {
-         "date": "20.09.2026",
-         "times": [
+          ]
+        }
+      ]
+    },
+    {
+      "date": "17.09.2026",
+      "times": [
+        {
+          "time": "19:00",
+          "events": [
             {
-               "time": "10:00",
-               "events": [
-                  {
-                     "title": "Gottesdienst",
-                     "notes": "Schloss Holte & Stukenbrock"
-                  }
-               ]
+              "title": "Schwesterngebetskreis",
+              "notes": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "18.09.2026",
+      "times": [
+        {
+          "time": "18:00",
+          "events": [
+            {
+              "title": "Gebetsstunde &",
+              "notes": ""
             },
             {
-               "time": "16:00",
-               "events": [
-                  {
-                     "title": "Gottesdienst",
-                     "notes": "Schloss Holte"
-                  }
-               ]
+              "title": "Kinderstunden",
+              "notes": ""
             }
-         ]
-      }
-   ]
+          ]
+        }
+      ]
+    },
+    {
+      "date": "19.09.2026",
+      "times": [
+        {
+          "time": "10:00",
+          "events": [
+            {
+              "title": "Hochzeit",
+              "notes": "Stukenbrock"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "20.09.2026",
+      "times": [
+        {
+          "time": "10:00",
+          "events": [
+            {
+              "title": "Gottesdienst",
+              "notes": "Schloss Holte & Stukenbrock"
+            }
+          ]
+        },
+        {
+          "time": "16:00",
+          "events": [
+            {
+              "title": "Gottesdienst",
+              "notes": "Schloss Holte"
+            }
+          ]
+        }
+      ]
+    }
+  ]
 }

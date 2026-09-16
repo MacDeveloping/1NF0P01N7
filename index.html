@@ -4,8 +4,8 @@
 
         <!-- Linker Bereich: Wochentag und Datum -->
         <div id="day-info" class="day-info">
-            <p id="weekday" class="weekday">Donnerstag</p>
-            <p id="date" class="date">15.09.</p>
+            <p id="weekday" class="weekday">Heute</p>
+            <p id="date" class="date">...</p>
         </div>
 
         <!-- Rechter Bereich: Uhrzeit und Termine -->
@@ -13,20 +13,16 @@
 
             <div id="time-event" class="time-event">
 
-                <p id="time" class="time">14:30 Uhr</p>
+                <p id="time" class="time">...</p>
 
                 <div id="container-events" class="container-events">
                     <div id="event" class="event">
-                        <p id="title" class="title">Das ist der Titel</p>
-                        <p id="description" class="description">Und hier stehen noch mehr Infos.</p>
+                        <p id="title" class="title">Keine Daten...</p>
+                        <p id="description" class="description"></p>
                     </div>
                 </div>
-
-
             </div>
-
         </div>
-
     </div>
 </div>
 </html>
@@ -152,58 +148,162 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        
-        // Counter zur identifizierung
-        //soll spaeter durch die JSON daten eingabe mit dem datum ersetzt werden
-        let cloneCounter = 0;
 
-        const original = document.getElementById("day-today");
+        // Konfiguration
+        // Wenn jsonTestData ein leerer String ist, wird die JSON per URL geladen.
+        // Ansonsten wird der Inhalt von jsonTestData benutzt (Roh-JSON).
+        const jsonUrl = "https://macdeveloping.github.io/1NF0P01N7/wochenuebersicht.json";
+        let jsonTestData = ""; // hier für Tests Rohdaten einfügen
+        const showDaysCount = 10; // wie viele Tage geprüft werden
+
+        // Template-Elemente (werden als Vorlage verwendet)
+        const originalTemplate = document.getElementById("day-today");
+        const originalTimeEvent = originalTemplate.querySelector(".time-event");
+        const originalEvent = originalTemplate.querySelector(".event");
+
+        // Container
         const container = document.getElementById("container-days");
-        const cloneBtn = document.getElementById("cloneBtn");
 
-        //Tagbox klonen
-        cloneBtn.addEventListener("click", () => {
-            // true = mit allen Kind-Elementen klonen
-            const clone = original.cloneNode(true);
+        // Vorlage aus dem DOM entfernen (nur als Template behalten)
+        originalTemplate.remove();
 
-            cloneCounter++;
+        // Aktuelle angezeigte Daten (für Fallback beim Fehler)
+        let lastData = null;
+        let refreshTimerId = null;
 
-            // Optional: ID aendern, um doppelte IDs zu vermeiden
-            clone.id = "clone-" + cloneCounter;
+        // Hilfsfunktion: format Date to DD.MM.YYYY
+        function formatDateDot(d) {
+            const dd = String(d.getDate()).padStart(2, '0');
+            const mm = String(d.getMonth() + 1).padStart(2, '0');
+            const yyyy = d.getFullYear();
+            return `${dd}.${mm}.${yyyy}`;
+        }
 
-            //Texte des Elements anpassen
-            const descr = clone.querySelector(".container-time-events .time-event .container-events .event .description");
-            
-            descr.textContent = "ID: " + clone.id;
+        // Hilfsfunktion: Wochentag in Deutsch
+        function weekdayGerman(d) {
+            return d.toLocaleDateString('de-DE', { weekday: 'long' });
+        }
 
+        // JSON laden (von Teststring oder per Fetch)
+        async function loadJson() {
+            if (jsonTestData && jsonTestData.trim() !== "") {
+                try {
+                    return JSON.parse(jsonTestData);
+                } catch (e) {
+                    console.error('jsonTestData kann nicht geparst werden', e);
+                    return null;
+                }
+            }
 
-            container.appendChild(clone);
-        });
+            try {
+                const resp = await fetch(jsonUrl, { cache: 'no-store' });
+                if (!resp.ok) throw new Error('HTTP ' + resp.status);
+                return await resp.json();
+            } catch (e) {
+                console.error('Fehler beim Laden der JSON:', e);
+                return null;
+            }
+        }
 
+        // Rendern der Tage basierend auf den geladenen Daten
+        function renderFromData(data) {
+            if (!data || !Array.isArray(data.days)) return;
 
-        const originalUhrzeit = document.getElementById("time-event");
-        const containerZeiten = document.getElementById("container-time-events");
-        const cloneUhrzeit = document.getElementById("cloneUhrzeit");
+            // Leere Container und fülle neu
+            container.innerHTML = '';
 
-        //Uhrzeit klonen
-        cloneUhrzeit.addEventListener("click", () => {
-            // true = mit allen Kind-Elementen klonen
-            const clone = originalUhrzeit.cloneNode(true);
+            const today = new Date();
 
-            containerZeiten.appendChild(clone);
-        });
+            for (let i = 0; i < showDaysCount; i++) {
+                const d = new Date(today);
+                d.setDate(today.getDate() + i);
+                const dateStr = formatDateDot(d);
 
+                // Suche nach Eintrag in JSON
+                const dayObj = data.days.find(x => x.date === dateStr);
+                if (!dayObj) continue; // überspringen wenn keine Daten vorhanden
 
-        const originalEvent = document.getElementById("event");
-        const containerEvents = document.getElementById("container-events");
-        const cloneEvent = document.getElementById("cloneEvent");
+                // Clone template
+                const clone = originalTemplate.cloneNode(true);
 
-        //Event klonen
-        cloneEvent.addEventListener("click", () => {
-            // true = mit allen Kind-Elementen klonen
-            const clone = originalEvent.cloneNode(true);
+                // Entferne IDs in Clone, damit keine Duplikate entstehen
+                clone.querySelectorAll('[id]').forEach(el => el.removeAttribute('id'));
 
-            containerEvents.appendChild(clone);
-        });
+                // Wochentag und Datum setzen
+                const weekdayEl = clone.querySelector('.weekday');
+                const dateEl = clone.querySelector('.date');
+                if (weekdayEl) weekdayEl.textContent = weekdayGerman(d);
+                if (dateEl) dateEl.textContent = dateStr;
+
+                const containerTimeEvents = clone.querySelector('.container-time-events');
+                // Entferne vorhandenes time-event Template im clone
+                containerTimeEvents.innerHTML = '';
+
+                // Zeiten und Events anfügen
+                if (Array.isArray(dayObj.times)) {
+                    dayObj.times.forEach(timeObj => {
+                        const timeClone = originalTimeEvent.cloneNode(true);
+                        // entferne ids
+                        timeClone.querySelectorAll('[id]').forEach(el => el.removeAttribute('id'));
+                        const timeEl = timeClone.querySelector('.time');
+                        const containerEvents = timeClone.querySelector('.container-events');
+                        if (timeEl) timeEl.textContent = timeObj.time || '';
+                        containerEvents.innerHTML = '';
+
+                        if (Array.isArray(timeObj.events)) {
+                            timeObj.events.forEach(ev => {
+                                const evClone = originalEvent.cloneNode(true);
+                                evClone.querySelectorAll('[id]').forEach(el => el.removeAttribute('id'));
+                                const titleEl = evClone.querySelector('.title');
+                                const descrEl = evClone.querySelector('.description');
+                                if (titleEl) titleEl.textContent = ev.title || '';
+                                if (descrEl) descrEl.textContent = ev.notes || '';
+                                containerEvents.appendChild(evClone);
+                            });
+                        }
+
+                        containerTimeEvents.appendChild(timeClone);
+                    });
+                }
+
+                container.appendChild(clone);
+            }
+        }
+
+        // Lädt JSON, rendert und steuert Refresh-Intervall
+        async function loadAndRender() {
+            const data = await loadJson();
+            if (data) {
+                // Daten erfolgreich geladen
+                lastData = data;
+                renderFromData(data);
+
+                // Refresh-Intervall setzen (falls angegeben)
+                if (data.refresh && Number(data.refresh) > 0) {
+                    const minutes = Number(data.refresh);
+                    const ms = minutes * 60 * 1000;
+                    if (refreshTimerId) clearInterval(refreshTimerId);
+                    refreshTimerId = setInterval(async () => {
+                        const newData = await loadJson();
+                        if (newData) {
+                            lastData = newData;
+                            renderFromData(newData);
+                        } else {
+                            console.warn('Refresh: Keine neuen Daten geladen, benutze letzte Daten.');
+                        }
+                    }, ms);
+                }
+            } else {
+                // Fehler beim Laden -> Falls wir bereits Daten haben, bleibt Anzeige bestehen
+                if (lastData) {
+                    console.warn('Benutze letzte bekannte Daten wegen Ladefehler.');
+                } else {
+                    console.error('Keine Daten zum Anzeigen verfügbar.');
+                }
+            }
+        }
+
+        // Initialer Aufruf
+        loadAndRender();
     });
 </script>
