@@ -1,4 +1,4 @@
-<html class="rootHTML">
+﻿<html class="rootHTML">
 <div id="container-days">
     <div id="day" class="daybox">
 
@@ -35,7 +35,7 @@
         --backround-color: #806b5b;
         --primary-text-color: black;
         /*Schrift*/
-        --primary-textgroeße: 35px;
+        --primary-textgroeße: 25px;
         --textgroeße-datum: 0.8rem;
         --textgroeße-beschreibung: 0.7rem;
         --textart-default-text: Poppins, Calibri, Arial;
@@ -44,10 +44,10 @@
         --daybox-ecke-radius: 25px;
         --daybox-padding: 20px;
         --abstand-naechste-daybox: 20px;
-        --breite-wochentag: 280px;
-        --breite-uhrzeit: 200px;
-        --abstand-tag-zu-wochentag: -0.3rem;
-        --abstand-beschreibung-zu-titel: -0.3rem;
+        --breite-wochentag: 180px;
+        --breite-uhrzeit: 130px;
+        --abstand-tag-zu-wochentag: -0.4rem;
+        --abstand-beschreibung-zu-titel: -0.4rem;
     }
 
     .rootHTML {
@@ -136,11 +136,12 @@
 
     .description {
         margin: 0px;
-        margin-top: var(--abstand-beschreibung-zu-titel);
+        margin-top: var(--abstand-tag-zu-wochentag);
         margin-bottom: 0px;
-        font-size: var(--textgroeße-beschreibung);
+        font-size: var(--textgroeße-beschreibung);        
     }
 </style>
+
 
 
 <script>
@@ -153,11 +154,11 @@
 
         // hier für Tests Rohdaten einfügen
         let jsonTestData = ''; 
-        const showDaysCount = 0; // wie viele Tage geprüft werden (wenn >0 gilt dieser Wert)
+        const showDaysCount = 20; // wie viele Tage geprüft werden (wenn >0 gilt dieser Wert)
         // Schwellwert (Wochentag 0=Sonntag,1=Montag..6=Samstag).
         // Ab diesem Wochentag wird bis zum übernächsten Sonntag angezeigt.
         const showNextSundayFrom = 5; // z.B. 5 = ab Freitag erweitern bis übernächsten Sonntag
-        const refreshInterval = 0.1; // Minuten für automatischen Reload (1 = 1 Minute)
+        const refreshInterval = 0.2; // Minuten für automatischen Reload (1 = 1 Minute)
 
         // Template-Elemente (werden als Vorlage verwendet)
         const originalTemplate = document.getElementById("day");
@@ -224,24 +225,7 @@
 
             const today = new Date();
 
-            // Bestimme Anzahl der anzuzeigenden Tage
-            let daysToShow;
-            if (showDaysCount && Number(showDaysCount) > 0) {
-                daysToShow = Number(showDaysCount);
-            } else {
-                // bis zum nächsten Sonntag (inklusive)
-                const daysUntilNextSunday = (7 - today.getDay()) % 7;
-                daysToShow = daysUntilNextSunday + 1;
-
-                // Falls aktueller Wochentag >= showNextSundayFrom, erweitere bis zum übernächsten Sonntag
-                if (typeof showNextSundayFrom !== 'undefined' && Number.isInteger(showNextSundayFrom)) {
-                    if (today.getDay() >= showNextSundayFrom) {
-                        daysToShow += 7; // bis Sonntag nach dem nächsten
-                    }
-                }
-            }
-
-            for (let i = 0; i < daysToShow; i++) {
+            for (let i = 0; i < showDaysCount; i++) {
                 const d = new Date(today);
                 d.setDate(today.getDate() + i);
                 const dateStr = formatDateDot(d);
