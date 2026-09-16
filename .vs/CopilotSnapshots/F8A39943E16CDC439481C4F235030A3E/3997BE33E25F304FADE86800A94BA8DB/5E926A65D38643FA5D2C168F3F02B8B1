@@ -1,4 +1,4 @@
-<html class="rootHTML">
+﻿<html class="rootHTML">
 <div id="container-days">
     <div id="day-today" class="daybox">
 
@@ -133,7 +133,6 @@
     .title {
         margin-top: 0px;
         margin-bottom: 0px;
-        background-color: gray;
     }
 
 
@@ -142,7 +141,6 @@
         margin-top: var(--abstand-tag-zu-wochentag);
         margin-bottom: 0px;
         font-size: var(--textgroeße-beschreibung);
-        background-color: gray;
     }
 </style>
 
@@ -179,13 +177,6 @@
             const mm = String(d.getMonth() + 1).padStart(2, '0');
             const yyyy = d.getFullYear();
             return `${dd}.${mm}.${yyyy}`;
-        }
-
-        // Hilfsfunktion: Tag und Monat formatieren: TT.MM.
-        function formatDayMonth(d) {
-            const dd = String(d.getDate()).padStart(2, '0');
-            const mm = String(d.getMonth() + 1).padStart(2, '0');
-            return `${dd}.${mm}.`;
         }
 
         // Hilfsfunktion: Wochentag in Deutsch
@@ -242,7 +233,7 @@
                 const weekdayEl = clone.querySelector('.weekday');
                 const dateEl = clone.querySelector('.date');
                 if (weekdayEl) weekdayEl.textContent = weekdayGerman(d);
-                if (dateEl) dateEl.textContent = formatDayMonth(d);
+                if (dateEl) dateEl.textContent = dateStr;
 
                 const containerTimeEvents = clone.querySelector('.container-time-events');
                 // Entferne vorhandenes time-event Template im clone
