@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -13,21 +12,22 @@
         }
 
         :root {
-            --sidebar: #1e293b;
-            --sidebar-hover: #334155;
-            --sidebar-text: #f8fafc;
-            --background: #f1f5f9;
-            --card: #ffffff;
-            --border: #cbd5e1;
-            --text: #0f172a;
-            --muted: #64748b;
-            --primary: #2563eb;
-            --primary-hover: #1d4ed8;
-            --danger: #dc2626;
-            --danger-hover: #b91c1c;
-            --success: #16a34a;
-            --success-hover: #15803d;
-            --radius: 10px;
+            /* Dark mode palette */
+            --sidebar: #071028;
+            --sidebar-hover: #0b1630;
+            --sidebar-text: #e6eef8;
+            --background: #071322;
+            --card: #07182a;
+            --border: #123044;
+            --text: #e6eef8;
+            --muted: #94a3b8;
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --danger: #f87171;
+            --danger-hover: #ef4444;
+            --success: #34d399;
+            --success-hover: #10b981;
+            --radius: 8px;
         }
 
         body {
@@ -48,14 +48,14 @@
            ========================= */
 
         .sidebar {
-            width: 270px;
-            min-width: 270px;
+            width: 240px;
+            min-width: 240px;
             background: var(--sidebar);
             color: var(--sidebar-text);
-            padding: 20px;
+            padding: 14px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
         }
 
             .sidebar h1 {
@@ -130,7 +130,7 @@
         .content {
             flex: 1;
             min-width: 0;
-            padding: 30px;
+            padding: 20px;
             overflow-x: auto;
         }
 
@@ -138,8 +138,15 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 20px;
-            margin-bottom: 25px;
+            gap: 12px;
+            margin-bottom: 18px;
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            padding: 8px 0;
+            background: linear-gradient(180deg, rgba(7,19,34,0.95), rgba(7,19,34,0.85));
+            backdrop-filter: blur(6px);
+            box-shadow: 0 1px 0 rgba(0,0,0,0.4);
         }
 
             .content-header h2 {
@@ -172,15 +179,15 @@
         .days-container {
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 12px;
         }
 
         .day {
             background: var(--card);
             border: 1px solid var(--border);
             border-radius: var(--radius);
-            padding: 18px;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+            padding: 12px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
         }
 
         .day-header {
@@ -198,17 +205,17 @@
         .times {
             display: flex;
             flex-direction: column;
-            gap: 14px;
-            margin-left: 15px;
-            padding-left: 18px;
-            border-left: 2px solid #e2e8f0;
+            gap: 8px;
+            margin-left: 12px;
+            padding-left: 12px;
+            border-left: 2px solid var(--border);
         }
 
         .time {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            padding: 14px;
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 8px;
         }
 
         .time-header {
@@ -226,17 +233,17 @@
         .events {
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            margin-left: 15px;
-            padding-left: 18px;
-            border-left: 2px solid #e2e8f0;
+            gap: 8px;
+            margin-left: 12px;
+            padding-left: 12px;
+            border-left: 2px solid var(--border);
         }
 
         .event {
-            background: white;
+            background: transparent;
             border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 12px;
+            border-radius: 6px;
+            padding: 8px;
         }
 
         .event-header {
@@ -259,12 +266,12 @@
         .field {
             display: flex;
             flex-direction: column;
-            gap: 5px;
+            gap: 3px;
             flex: 1;
         }
 
             .field label {
-                font-size: 12px;
+                font-size: 11px;
                 font-weight: 700;
                 color: var(--muted);
             }
@@ -274,13 +281,13 @@
             width: 100%;
             border: 1px solid var(--border);
             border-radius: 6px;
-            background: white;
+            background: transparent;
             color: var(--text);
-            padding: 9px 10px;
+            padding: 6px 8px;
             font: inherit;
-            font-size: 14px;
+            font-size: 13px;
             outline: none;
-            transition: border-color 0.15s, box-shadow 0.15s;
+            transition: border-color 0.12s, box-shadow 0.12s;
         }
 
             input:focus,
@@ -290,13 +297,13 @@
             }
 
         textarea {
-            min-height: 70px;
+            min-height: 60px;
             resize: vertical;
         }
 
         .fields-row {
             display: flex;
-            gap: 12px;
+            gap: 8px;
         }
 
         /* =========================
@@ -306,11 +313,11 @@
         .btn {
             border: 0;
             border-radius: 6px;
-            padding: 7px 10px;
+            padding: 6px 8px;
             cursor: pointer;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
-            transition: background 0.15s, transform 0.1s;
+            transition: background 0.12s, transform 0.08s;
         }
 
             .btn:active {
@@ -336,13 +343,13 @@
             }
 
         .btn-add-large {
-            margin-top: 14px;
+            margin-top: 10px;
             width: 100%;
-            padding: 10px;
-            border: 1px dashed #94a3b8;
+            padding: 8px;
+            border: 1px dashed var(--muted);
             border-radius: 7px;
             background: transparent;
-            color: #475569;
+            color: var(--muted);
             cursor: pointer;
             font-weight: 600;
         }
@@ -366,11 +373,23 @@
            ========================= */
 
         .raw-json {
-            margin-top: 30px;
-            background: #0f172a;
+            margin-top: 18px;
+            background: #071727;
             color: #e2e8f0;
             border-radius: var(--radius);
-            padding: 15px;
+            padding: 12px;
+        }
+
+        /* Toolbar inside header that stays visible (not scrolling away) */
+        .toolbar {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .toolbar .btn-toggle-active {
+            background: rgba(255,255,255,0.06);
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.03);
         }
 
         .raw-json-header {
@@ -491,9 +510,27 @@
 
                 <h2>JSON bearbeiten</h2>
 
-                <div id="status"
-                     class="status">
-                    Lade JSON …
+                <div class="toolbar">
+
+                    <button id="toggleHidePastBtn"
+                            class="btn"
+                            title="Alle vergangenen Tage ausblenden"
+                            onclick="toggleHidePast()">
+                        Vergangene ausblenden
+                    </button>
+
+                    <button id="addNextWeekBtn"
+                            class="btn btn-add"
+                            title="Nächste Woche hinzufügen"
+                            onclick="addNextWeek()">
+                        Nächste Woche hinzufügen
+                    </button>
+
+                    <div id="status"
+                         class="status">
+                        Lade JSON …
+                    </div>
+
                 </div>
 
             </div>
@@ -546,6 +583,149 @@
         let data = {
             days: []
         };
+
+        // Sichtbarkeit: vergangene Tage ausblenden
+        let hidePast = false;
+
+        function parseDateStr(s) {
+            if (!s || typeof s !== "string") return null;
+            const parts = s.trim().split(".");
+            if (parts.length < 3) return null;
+            const day = parseInt(parts[0], 10);
+            const month = parseInt(parts[1], 10) - 1;
+            const year = parseInt(parts[2], 10);
+            if (Number.isNaN(day) || Number.isNaN(month) || Number.isNaN(year)) return null;
+            return new Date(year, month, day);
+        }
+
+        function toggleHidePast() {
+            hidePast = !hidePast;
+            const btn = document.getElementById("toggleHidePastBtn");
+            if (btn) {
+                if (hidePast) btn.classList.add("btn-toggle-active");
+                else btn.classList.remove("btn-toggle-active");
+            }
+            render();
+        }
+
+        function addNextWeek() {
+            const template = {
+               "days": [
+                  {
+                     "date": "01.01.2026",
+                     "times": [
+                        {
+                           "time": "10:00",
+                           "events": [
+                              {
+                                 "title": "Gebetskreis",
+                                 "notes": ""
+                              }
+                           ]
+                        },
+                        {
+                           "time": "17:45",
+                           "events": [
+                              {
+                                 "title": "Elterngebetskreis",
+                                 "notes": ""
+                              }
+                           ]
+                        }
+                     ]
+                  },
+                  {
+                     "date": "02.01.2026",
+                     "times": [
+                        {
+                           "time": "19:00",
+                           "events": [
+                              {
+                                 "title": "Bibelstunde",
+                                 "notes": "Stukenbrock"
+                              },
+                              {
+                                 "title": "Gemeindestunde",
+                                 "notes": "Schloss Holte"
+                              }
+                           ]
+                        }
+                     ]
+                  },
+                  {
+                     "date": "03.01.2026",
+                     "times": [
+                        {
+                           "time": "19:00",
+                           "events": [
+                              {
+                                 "title": "Schwesterngebetskreis",
+                                 "notes": ""
+                              }
+                           ]
+                        }
+                     ]
+                  },
+                  {
+                     "date": "04.01.2026",
+                     "times": [
+                        {
+                           "time": "18:00",
+                           "events": [
+                              {
+                                 "title": "Gebetsstunde Kinderstunden Jungscharstunde",
+                                 "notes": ""
+                              }
+                           ]
+                        },
+                        {
+                           "time": "19:45",
+                           "events": [
+                              {
+                                 "title": "Jugendstunde",
+                                 "notes": ""
+                              }
+                           ]
+                        }
+                     ]
+                  },
+                  {
+                     "date": "05.01.2026",
+                     "times": [
+                        {
+                           "time": "10:00",
+                           "events": [
+                              {
+                                 "title": "Gottesdienst",
+                                 "notes": "Schloss Holte & Stukenbrock"
+                              }
+                           ]
+                        },
+                        {
+                           "time": "16:00",
+                           "events": [
+                              {
+                                 "title": "Gottesdienst",
+                                 "notes": "Schloss Holte"
+                              }
+                           ]
+                        }
+                     ]
+                  }
+               ]
+            };
+
+            try {
+                validateJson(template);
+                data.days = data.days.concat(template.days);
+                render();
+                updateRawJson();
+                setStatus("Nächste Woche hinzugefügt", "success");
+            } catch (err) {
+                console.error(err);
+                setStatus("Fehler beim Hinzufügen der Woche", "error");
+            }
+        }
 
 
         /*
@@ -751,8 +931,18 @@
 
             } else {
 
+                const today = new Date();
+                today.setHours(0,0,0,0);
+
                 data.days.forEach(
                     (day, dayIndex) => {
+
+                        if (hidePast) {
+                            const d = parseDateStr(day.date);
+                            if (d && d < today) {
+                                return; // skip past day
+                            }
+                        }
 
                         editor.appendChild(
                             createDayElement(
@@ -1578,4 +1768,3 @@
 
 </body>
 </html>
-```
