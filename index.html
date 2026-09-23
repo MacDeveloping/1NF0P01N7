@@ -1,5 +1,6 @@
-<html class="rootHTML" lang="de">
-<div id="container-days">
+<!--<html class="rootHTML"> -->
+<!--lang="de"  -->
+<div id="container-days" class="rootHTMLersatz">
     <div id="day" class="daybox">
 
         <!-- Linker Bereich: Wochentag und Datum -->
@@ -25,7 +26,7 @@
         </div>
     </div>
 </div>
-</html>
+
 
 
 <style>
@@ -36,8 +37,8 @@
         --primary-text-color: black;
         /*Schrift*/
         --primary-textgroeße: 35px;
-        --textgroeße-datum: 0.8rem;
-        --textgroeße-beschreibung: 0.7rem;
+        --textgroeße-datum: 30px;
+        --textgroeße-beschreibung: 25px;
         --textart-default-text: Poppins, Calibri, Arial;
         --textart-default-title: 'Black Mango', Calibri, Arial;
         /*Abstaende und Groeßen*/
@@ -50,8 +51,7 @@
         --abstand-beschreibung-zu-titel: -0.3rem;
     }
 
-    .rootHTML {
-        background-color: black;
+    .rootHTMLersatz {
         font-size: var(--primary-textgroeße);
     }
 
@@ -80,10 +80,10 @@
         align-items: flex-start;
     }
 
-    /* Utility: aktueller Tag - Fettformatierung */
-    .daybox.day--today {
-        font-weight: bold;
-    }
+        /* Utility: aktueller Tag - Fettformatierung */
+        .daybox.day--today {
+            font-weight: bold;
+        }
 
     /* Container: Links Uhrzeit, Rechts Events */
     .day-info {
@@ -126,12 +126,12 @@
         flex-direction: column;
         flex-wrap: nowrap;
         align-items: flex-start;
-        hyphens: auto;
+        /*hyphens: auto;*/
     }
 
     .title {
         margin-top: 0px;
-        margin-bottom: 0px;        
+        margin-bottom: 0px;
     }
 
 
@@ -154,7 +154,7 @@
         const jsonUrl = "https://macdeveloping.github.io/1NF0P01N7/wochenuebersicht.json";
 
         // hier für Tests Rohdaten einfügen
-        let jsonTestData = ''; 
+        let jsonTestData = '';
         const showDaysCount = 0; // wie viele Tage geprüft werden (wenn >0 gilt dieser Wert)
         // Schwellwert (Wochentag 0=Sonntag,1=Montag..6=Samstag).
         // Ab diesem Wochentag wird bis zum übernächsten Sonntag angezeigt.
