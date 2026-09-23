@@ -1,0 +1,1581 @@
+```html
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Wochenübersicht – JSON Editor</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        :root {
+            --sidebar: #1e293b;
+            --sidebar-hover: #334155;
+            --sidebar-text: #f8fafc;
+            --background: #f1f5f9;
+            --card: #ffffff;
+            --border: #cbd5e1;
+            --text: #0f172a;
+            --muted: #64748b;
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --danger: #dc2626;
+            --danger-hover: #b91c1c;
+            --success: #16a34a;
+            --success-hover: #15803d;
+            --radius: 10px;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: var(--background);
+            color: var(--text);
+        }
+
+        .app {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* =========================
+           SIDEBAR
+           ========================= */
+
+        .sidebar {
+            width: 270px;
+            min-width: 270px;
+            background: var(--sidebar);
+            color: var(--sidebar-text);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+            .sidebar h1 {
+                margin: 0 0 20px 0;
+                font-size: 20px;
+                line-height: 1.3;
+            }
+
+        .sidebar-section {
+            margin-top: 10px;
+        }
+
+        .sidebar-section-title {
+            color: #94a3b8;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin: 12px 0 7px;
+        }
+
+        .sidebar button {
+            width: 100%;
+            border: 0;
+            border-radius: 7px;
+            padding: 11px 12px;
+            margin-bottom: 6px;
+            text-align: left;
+            color: var(--sidebar-text);
+            background: transparent;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.15s, transform 0.1s;
+        }
+
+            .sidebar button:hover {
+                background: var(--sidebar-hover);
+            }
+
+            .sidebar button:active {
+                transform: translateY(1px);
+            }
+
+            .sidebar button.primary {
+                background: var(--primary);
+            }
+
+                .sidebar button.primary:hover {
+                    background: var(--primary-hover);
+                }
+
+            .sidebar button.success {
+                background: var(--success);
+            }
+
+                .sidebar button.success:hover {
+                    background: var(--success-hover);
+                }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding-top: 15px;
+            color: #94a3b8;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        /* =========================
+           CONTENT
+           ========================= */
+
+        .content {
+            flex: 1;
+            min-width: 0;
+            padding: 30px;
+            overflow-x: auto;
+        }
+
+        .content-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+            .content-header h2 {
+                margin: 0;
+                font-size: 28px;
+            }
+
+        .status {
+            padding: 7px 11px;
+            border-radius: 999px;
+            background: #e2e8f0;
+            color: #475569;
+            font-size: 13px;
+        }
+
+            .status.success {
+                background: #dcfce7;
+                color: #166534;
+            }
+
+            .status.error {
+                background: #fee2e2;
+                color: #991b1b;
+            }
+
+        /* =========================
+           JSON STRUCTURE
+           ========================= */
+
+        .days-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .day {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 18px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+        }
+
+        .day-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+            .day-header h3 {
+                margin: 0;
+                font-size: 18px;
+            }
+
+        .times {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin-left: 15px;
+            padding-left: 18px;
+            border-left: 2px solid #e2e8f0;
+        }
+
+        .time {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 14px;
+        }
+
+        .time-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+            .time-header h4 {
+                margin: 0;
+                font-size: 16px;
+            }
+
+        .events {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-left: 15px;
+            padding-left: 18px;
+            border-left: 2px solid #e2e8f0;
+        }
+
+        .event {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
+        }
+
+        .event-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .event-number {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--muted);
+        }
+
+        /* =========================
+           INPUTS
+           ========================= */
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            flex: 1;
+        }
+
+            .field label {
+                font-size: 12px;
+                font-weight: 700;
+                color: var(--muted);
+            }
+
+        input,
+        textarea {
+            width: 100%;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: white;
+            color: var(--text);
+            padding: 9px 10px;
+            font: inherit;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.15s, box-shadow 0.15s;
+        }
+
+            input:focus,
+            textarea:focus {
+                border-color: var(--primary);
+                box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+            }
+
+        textarea {
+            min-height: 70px;
+            resize: vertical;
+        }
+
+        .fields-row {
+            display: flex;
+            gap: 12px;
+        }
+
+        /* =========================
+           BUTTONS
+           ========================= */
+
+        .btn {
+            border: 0;
+            border-radius: 6px;
+            padding: 7px 10px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: background 0.15s, transform 0.1s;
+        }
+
+            .btn:active {
+                transform: translateY(1px);
+            }
+
+        .btn-add {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+            .btn-add:hover {
+                background: #bfdbfe;
+            }
+
+        .btn-delete {
+            background: #fee2e2;
+            color: var(--danger);
+        }
+
+            .btn-delete:hover {
+                background: #fecaca;
+            }
+
+        .btn-add-large {
+            margin-top: 14px;
+            width: 100%;
+            padding: 10px;
+            border: 1px dashed #94a3b8;
+            border-radius: 7px;
+            background: transparent;
+            color: #475569;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+            .btn-add-large:hover {
+                background: #f8fafc;
+                border-color: var(--primary);
+                color: var(--primary);
+            }
+
+        .empty {
+            padding: 20px;
+            text-align: center;
+            color: var(--muted);
+            border: 1px dashed var(--border);
+            border-radius: 8px;
+        }
+
+        /* =========================
+           RAW JSON
+           ========================= */
+
+        .raw-json {
+            margin-top: 30px;
+            background: #0f172a;
+            color: #e2e8f0;
+            border-radius: var(--radius);
+            padding: 15px;
+        }
+
+        .raw-json-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+            .raw-json-header strong {
+                font-size: 14px;
+            }
+
+        #jsonPreview {
+            margin: 0;
+            max-height: 400px;
+            overflow: auto;
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+            font-size: 12px;
+            line-height: 1.5;
+            white-space: pre;
+        }
+
+        /* =========================
+           RESPONSIVE
+           ========================= */
+
+        @media (max-width: 800px) {
+            .app {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                min-width: 0;
+            }
+
+            .content {
+                padding: 15px;
+            }
+
+            .fields-row {
+                flex-direction: column;
+            }
+
+            .times,
+            .events {
+                margin-left: 0;
+                padding-left: 12px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="app">
+
+        <!-- =========================
+             LINKES MENÜ
+             ========================= -->
+
+        <aside class="sidebar">
+
+            <h1>Wochenübersicht</h1>
+
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">
+                    JSON
+                </div>
+
+                <button class="primary"
+                        onclick="loadFromUrl()">
+                    ↻ Von URL laden
+                </button>
+
+                <button onclick="document.getElementById('fileInput').click()">
+                    📂 Lokale JSON laden
+                </button>
+
+                <button class="success"
+                        onclick="downloadJson()">
+                    💾 JSON speichern
+                </button>
+
+                <input id="fileInput"
+                       type="file"
+                       accept=".json,application/json"
+                       style="display:none"
+                       onchange="loadLocalFile(event)">
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">
+                    Ansicht
+                </div>
+
+                <button onclick="toggleRawJson()">
+                    { } JSON-Vorschau
+                </button>
+            </div>
+
+            <div class="sidebar-footer">
+                Änderungen werden direkt in der aktuellen JSON-Struktur
+                gespeichert.
+            </div>
+
+        </aside>
+
+
+        <!-- =========================
+             HAUPTBEREICH
+             ========================= -->
+
+        <main class="content">
+
+            <div class="content-header">
+
+                <h2>JSON bearbeiten</h2>
+
+                <div id="status"
+                     class="status">
+                    Lade JSON …
+                </div>
+
+            </div>
+
+            <div id="editor"
+                 class="days-container">
+            </div>
+
+            <div id="rawJsonContainer"
+                 class="raw-json"
+                 style="display:none;">
+
+                <div class="raw-json-header">
+
+                    <strong>Aktuelle JSON</strong>
+
+                    <button class="btn btn-add"
+                            onclick="copyJson()">
+                        JSON kopieren
+                    </button>
+
+                </div>
+
+                <pre id="jsonPreview"></pre>
+
+            </div>
+
+        </main>
+
+    </div>
+
+
+    <script>
+        /*
+         * ==========================================================
+         * KONFIGURATION
+         * ==========================================================
+         */
+
+        const JSON_URL =
+            "https://macdeveloping.github.io/1NF0P01N7/wochenuebersicht.json";
+
+
+        /*
+         * ==========================================================
+         * AKTUELLE DATEN
+         * ==========================================================
+         */
+
+        let data = {
+            days: []
+        };
+
+
+        /*
+         * ==========================================================
+         * INITIALISIERUNG
+         * ==========================================================
+         */
+
+        document.addEventListener("DOMContentLoaded", () => {
+            loadFromUrl();
+        });
+
+
+        /*
+         * ==========================================================
+         * JSON VON URL LADEN
+         * ==========================================================
+         */
+
+        async function loadFromUrl() {
+
+            setStatus("Lade JSON …");
+
+            try {
+
+                const response = await fetch(JSON_URL, {
+                    cache: "no-cache"
+                });
+
+                if (!response.ok) {
+                    throw new Error(
+                        `HTTP-Fehler ${response.status}`
+                    );
+                }
+
+                const json = await response.json();
+
+                validateJson(json);
+
+                data = json;
+
+                render();
+
+                setStatus("JSON erfolgreich geladen", "success");
+
+            } catch (error) {
+
+                console.error(error);
+
+                setStatus(
+                    "Fehler beim Laden der JSON",
+                    "error"
+                );
+
+                alert(
+                    "Die JSON konnte nicht geladen werden.\n\n" +
+                    error.message +
+                    "\n\n" +
+                    "Mögliche Ursache: Die HTML-Datei wird lokal geöffnet " +
+                    "und der Browser blockiert den Zugriff auf die URL " +
+                    "(CORS). In diesem Fall kann die JSON über " +
+                    "\"Lokale JSON laden\" geöffnet werden."
+                );
+            }
+        }
+
+
+        /*
+         * ==========================================================
+         * LOKALE JSON LADEN
+         * ==========================================================
+         */
+
+        function loadLocalFile(event) {
+
+            const file =
+                event.target.files[0];
+
+            if (!file) {
+                return;
+            }
+
+            const reader =
+                new FileReader();
+
+            reader.onload = function (e) {
+
+                try {
+
+                    const json =
+                        JSON.parse(e.target.result);
+
+                    validateJson(json);
+
+                    data = json;
+
+                    render();
+
+                    setStatus(
+                        "Lokale JSON geladen",
+                        "success"
+                    );
+
+                } catch (error) {
+
+                    console.error(error);
+
+                    setStatus(
+                        "Ungültige JSON",
+                        "error"
+                    );
+
+                    alert(
+                        "Die ausgewählte Datei ist keine gültige " +
+                        "Wochenübersicht-JSON.\n\n" +
+                        error.message
+                    );
+                }
+
+            };
+
+            reader.onerror = function () {
+
+                setStatus(
+                    "Datei konnte nicht gelesen werden",
+                    "error"
+                );
+
+                alert(
+                    "Die Datei konnte nicht gelesen werden."
+                );
+            };
+
+            reader.readAsText(file);
+
+            // Ermöglicht das erneute Auswählen derselben Datei.
+            event.target.value = "";
+        }
+
+
+        /*
+         * ==========================================================
+         * JSON VALIDIEREN
+         * ==========================================================
+         */
+
+        function validateJson(json) {
+
+            if (
+                typeof json !== "object" ||
+                json === null
+            ) {
+                throw new Error(
+                    "Die JSON muss ein Objekt sein."
+                );
+            }
+
+            if (!Array.isArray(json.days)) {
+                throw new Error(
+                    'Das Feld "days" muss ein Array sein.'
+                );
+            }
+
+            // Fehlende Arrays ergänzen.
+            json.days.forEach(day => {
+
+                if (!Array.isArray(day.times)) {
+                    day.times = [];
+                }
+
+                day.times.forEach(time => {
+
+                    if (!Array.isArray(time.events)) {
+                        time.events = [];
+                    }
+
+                });
+
+            });
+        }
+
+
+        /*
+         * ==========================================================
+         * HAUPT-RENDER-FUNKTION
+         * ==========================================================
+         */
+
+        function render() {
+
+            const editor =
+                document.getElementById("editor");
+
+            editor.innerHTML = "";
+
+            if (!data.days || data.days.length === 0) {
+
+                editor.innerHTML = `
+                    <div class="empty">
+                        Noch keine Tage vorhanden.
+                    </div>
+                `;
+
+            } else {
+
+                data.days.forEach(
+                    (day, dayIndex) => {
+
+                        editor.appendChild(
+                            createDayElement(
+                                day,
+                                dayIndex
+                            )
+                        );
+
+                    }
+                );
+            }
+
+            // Globalen "Tag hinzufügen"-Button erzeugen.
+            const addDayButton =
+                document.createElement("button");
+
+            addDayButton.className =
+                "btn-add-large";
+
+            addDayButton.textContent =
+                "+ Tag hinzufügen";
+
+            addDayButton.onclick =
+                () => addDay();
+
+            editor.appendChild(addDayButton);
+
+            updateRawJson();
+        }
+
+
+        /*
+         * ==========================================================
+         * DAY ELEMENT
+         * ==========================================================
+         */
+
+        function createDayElement(day, dayIndex) {
+
+            const container =
+                document.createElement("section");
+
+            container.className =
+                "day";
+
+            container.innerHTML = `
+                <div class="day-header">
+
+                    <h3>Tag ${dayIndex + 1}</h3>
+
+                    <button
+                        class="btn btn-delete"
+                        title="Diesen Tag löschen">
+                        Löschen
+                    </button>
+
+                </div>
+
+                <div class="fields-row">
+
+                    <div class="field">
+
+                        <label>
+                            date
+                        </label>
+
+                        <input
+                            type="text"
+                            value="${escapeAttribute(day.date ?? "")}"
+                            placeholder="z.B. 21.09.2026">
+
+                    </div>
+
+                </div>
+
+                <div class="times"></div>
+
+                <button class="btn-add-large">
+                    + Zeit hinzufügen
+                </button>
+            `;
+
+            /*
+             * Datum
+             */
+
+            const dateInput =
+                container.querySelector("input");
+
+            dateInput.addEventListener(
+                "input",
+                () => {
+
+                    data.days[dayIndex].date =
+                        dateInput.value;
+
+                    updateRawJson();
+                }
+            );
+
+
+            /*
+             * Tag löschen
+             */
+
+            container
+                .querySelector(".btn-delete")
+                .addEventListener(
+                    "click",
+                    () => deleteDay(dayIndex)
+                );
+
+
+            /*
+             * Zeiten
+             */
+
+            const timesContainer =
+                container.querySelector(".times");
+
+            if (day.times.length === 0) {
+
+                timesContainer.innerHTML = `
+                    <div class="empty">
+                        Keine Zeiten vorhanden.
+                    </div>
+                `;
+
+            } else {
+
+                day.times.forEach(
+                    (time, timeIndex) => {
+
+                        timesContainer.appendChild(
+                            createTimeElement(
+                                time,
+                                dayIndex,
+                                timeIndex
+                            )
+                        );
+
+                    }
+                );
+            }
+
+
+            /*
+             * Zeit hinzufügen
+             */
+
+            container
+                .querySelector(".btn-add-large")
+                .addEventListener(
+                    "click",
+                    () => addTime(dayIndex)
+                );
+
+
+            return container;
+        }
+
+
+        /*
+         * ==========================================================
+         * TIME ELEMENT
+         * ==========================================================
+         */
+
+        function createTimeElement(
+            time,
+            dayIndex,
+            timeIndex
+        ) {
+
+            const container =
+                document.createElement("div");
+
+            container.className =
+                "time";
+
+            container.innerHTML = `
+                <div class="time-header">
+
+                    <h4>
+                        Zeit ${timeIndex + 1}
+                    </h4>
+
+                    <button
+                        class="btn btn-delete">
+                        Löschen
+                    </button>
+
+                </div>
+
+                <div class="fields-row">
+
+                    <div class="field">
+
+                        <label>
+                            time
+                        </label>
+
+                        <input
+                            type="text"
+                            value="${escapeAttribute(time.time ?? "")}"
+                            placeholder="z.B. 19:45">
+
+                    </div>
+
+                </div>
+
+                <div class="events"></div>
+
+                <button class="btn-add-large">
+                    + Event hinzufügen
+                </button>
+            `;
+
+
+            /*
+             * Zeit bearbeiten
+             */
+
+            const timeInput =
+                container.querySelector("input");
+
+            timeInput.addEventListener(
+                "input",
+                () => {
+
+                    data.days[dayIndex]
+                        .times[timeIndex]
+                        .time =
+                        timeInput.value;
+
+                    updateRawJson();
+                }
+            );
+
+
+            /*
+             * Zeit löschen
+             */
+
+            container
+                .querySelector(".btn-delete")
+                .addEventListener(
+                    "click",
+                    () => deleteTime(
+                        dayIndex,
+                        timeIndex
+                    )
+                );
+
+
+            /*
+             * Events
+             */
+
+            const eventsContainer =
+                container.querySelector(".events");
+
+            if (
+                !time.events ||
+                time.events.length === 0
+            ) {
+
+                eventsContainer.innerHTML = `
+                    <div class="empty">
+                        Keine Events vorhanden.
+                    </div>
+                `;
+
+            } else {
+
+                time.events.forEach(
+                    (event, eventIndex) => {
+
+                        eventsContainer.appendChild(
+                            createEventElement(
+                                event,
+                                dayIndex,
+                                timeIndex,
+                                eventIndex
+                            )
+                        );
+
+                    }
+                );
+            }
+
+
+            /*
+             * Event hinzufügen
+             */
+
+            container
+                .querySelector(".btn-add-large")
+                .addEventListener(
+                    "click",
+                    () => addEvent(
+                        dayIndex,
+                        timeIndex
+                    )
+                );
+
+
+            return container;
+        }
+
+
+        /*
+         * ==========================================================
+         * EVENT ELEMENT
+         * ==========================================================
+         */
+
+        function createEventElement(
+            event,
+            dayIndex,
+            timeIndex,
+            eventIndex
+        ) {
+
+            const container =
+                document.createElement("div");
+
+            container.className =
+                "event";
+
+            container.innerHTML = `
+                <div class="event-header">
+
+                    <span class="event-number">
+                        Event ${eventIndex + 1}
+                    </span>
+
+                    <button
+                        class="btn btn-delete">
+                        Löschen
+                    </button>
+
+                </div>
+
+                <div class="fields-row">
+
+                    <div class="field">
+
+                        <label>
+                            title
+                        </label>
+
+                        <input
+                            type="text"
+                            value="${escapeAttribute(event.title ?? "")}"
+                            placeholder="Titel">
+
+                    </div>
+
+                </div>
+
+                <div
+                    class="field"
+                    style="margin-top:10px;">
+
+                    <label>
+                        notes
+                    </label>
+
+                    <textarea
+                        placeholder="Notizen">${escapeHtml(event.notes ?? "")}</textarea>
+
+                </div>
+            `;
+
+
+            /*
+             * Titel
+             */
+
+            const titleInput =
+                container.querySelector("input");
+
+            titleInput.addEventListener(
+                "input",
+                () => {
+
+                    data.days[dayIndex]
+                        .times[timeIndex]
+                        .events[eventIndex]
+                        .title =
+                        titleInput.value;
+
+                    updateRawJson();
+                }
+            );
+
+
+            /*
+             * Notes
+             */
+
+            const notesInput =
+                container.querySelector("textarea");
+
+            notesInput.addEventListener(
+                "input",
+                () => {
+
+                    data.days[dayIndex]
+                        .times[timeIndex]
+                        .events[eventIndex]
+                        .notes =
+                        notesInput.value;
+
+                    updateRawJson();
+                }
+            );
+
+
+            /*
+             * Event löschen
+             */
+
+            container
+                .querySelector(".btn-delete")
+                .addEventListener(
+                    "click",
+                    () => deleteEvent(
+                        dayIndex,
+                        timeIndex,
+                        eventIndex
+                    )
+                );
+
+
+            return container;
+        }
+
+
+        /*
+         * ==========================================================
+         * TAG HINZUFÜGEN
+         * ==========================================================
+         */
+
+        function addDay() {
+
+            data.days.push({
+                date: "",
+                times: []
+            });
+
+            render();
+
+            setStatus(
+                "Tag hinzugefügt",
+                "success"
+            );
+        }
+
+
+        /*
+         * ==========================================================
+         * ZEIT HINZUFÜGEN
+         * ==========================================================
+         */
+
+        function addTime(dayIndex) {
+
+            data.days[dayIndex]
+                .times
+                .push({
+                    time: "",
+                    events: []
+                });
+
+            render();
+
+            setStatus(
+                "Zeit hinzugefügt",
+                "success"
+            );
+        }
+
+
+        /*
+         * ==========================================================
+         * EVENT HINZUFÜGEN
+         * ==========================================================
+         */
+
+        function addEvent(
+            dayIndex,
+            timeIndex
+        ) {
+
+            data.days[dayIndex]
+                .times[timeIndex]
+                .events
+                .push({
+                    title: "",
+                    notes: ""
+                });
+
+            render();
+
+            setStatus(
+                "Event hinzugefügt",
+                "success"
+            );
+        }
+
+
+        /*
+         * ==========================================================
+         * TAG LÖSCHEN
+         * ==========================================================
+         */
+
+        function deleteDay(dayIndex) {
+
+            const day =
+                data.days[dayIndex];
+
+            const confirmed =
+                confirm(
+                    `Tag "${day.date || "ohne Datum"}" wirklich löschen?`
+                );
+
+            if (!confirmed) {
+                return;
+            }
+
+            data.days.splice(
+                dayIndex,
+                1
+            );
+
+            render();
+
+            setStatus(
+                "Tag gelöscht",
+                "success"
+            );
+        }
+
+
+        /*
+         * ==========================================================
+         * ZEIT LÖSCHEN
+         * ==========================================================
+         */
+
+        function deleteTime(
+            dayIndex,
+            timeIndex
+        ) {
+
+            const time =
+                data.days[dayIndex]
+                    .times[timeIndex];
+
+            const confirmed =
+                confirm(
+                    `Zeit "${time.time || "ohne Uhrzeit"}" wirklich löschen?`
+                );
+
+            if (!confirmed) {
+                return;
+            }
+
+            data.days[dayIndex]
+                .times
+                .splice(
+                    timeIndex,
+                    1
+                );
+
+            render();
+
+            setStatus(
+                "Zeit gelöscht",
+                "success"
+            );
+        }
+
+
+        /*
+         * ==========================================================
+         * EVENT LÖSCHEN
+         * ==========================================================
+         */
+
+        function deleteEvent(
+            dayIndex,
+            timeIndex,
+            eventIndex
+        ) {
+
+            const event =
+                data.days[dayIndex]
+                    .times[timeIndex]
+                    .events[eventIndex];
+
+            const confirmed =
+                confirm(
+                    `Event "${event.title || "ohne Titel"}" wirklich löschen?`
+                );
+
+            if (!confirmed) {
+                return;
+            }
+
+            data.days[dayIndex]
+                .times[timeIndex]
+                .events
+                .splice(
+                    eventIndex,
+                    1
+                );
+
+            render();
+
+            setStatus(
+                "Event gelöscht",
+                "success"
+            );
+        }
+
+
+        /*
+         * ==========================================================
+         * JSON LOKAL SPEICHERN
+         * ==========================================================
+         */
+
+        function downloadJson() {
+
+            const json =
+                JSON.stringify(
+                    data,
+                    null,
+                    2
+                );
+
+            const blob =
+                new Blob(
+                    [json],
+                    {
+                        type: "application/json"
+                    }
+                );
+
+            const url =
+                URL.createObjectURL(blob);
+
+            const link =
+                document.createElement("a");
+
+            link.href = url;
+
+            link.download =
+                "wochenuebersicht.json";
+
+            document.body.appendChild(link);
+
+            link.click();
+
+            document.body.removeChild(link);
+
+            URL.revokeObjectURL(url);
+
+            setStatus(
+                "JSON gespeichert",
+                "success"
+            );
+        }
+
+
+        /*
+         * ==========================================================
+         * JSON KOPIEREN
+         * ==========================================================
+         */
+
+        async function copyJson() {
+
+            const json =
+                JSON.stringify(
+                    data,
+                    null,
+                    2
+                );
+
+            try {
+
+                await navigator.clipboard.writeText(
+                    json
+                );
+
+                setStatus(
+                    "JSON kopiert",
+                    "success"
+                );
+
+            } catch (error) {
+
+                alert(
+                    "Die JSON konnte nicht automatisch kopiert werden."
+                );
+            }
+        }
+
+
+        /*
+         * ==========================================================
+         * RAW JSON AKTUALISIEREN
+         * ==========================================================
+         */
+
+        function updateRawJson() {
+
+            const preview =
+                document.getElementById(
+                    "jsonPreview"
+                );
+
+            if (!preview) {
+                return;
+            }
+
+            preview.textContent =
+                JSON.stringify(
+                    data,
+                    null,
+                    2
+                );
+        }
+
+
+        /*
+         * ==========================================================
+         * RAW JSON EIN-/AUSBLENDEN
+         * ==========================================================
+         */
+
+        function toggleRawJson() {
+
+            const container =
+                document.getElementById(
+                    "rawJsonContainer"
+                );
+
+            if (
+                container.style.display === "none"
+            ) {
+
+                container.style.display =
+                    "block";
+
+                updateRawJson();
+
+            } else {
+
+                container.style.display =
+                    "none";
+            }
+        }
+
+
+        /*
+         * ==========================================================
+         * STATUS
+         * ==========================================================
+         */
+
+        function setStatus(
+            message,
+            type = ""
+        ) {
+
+            const status =
+                document.getElementById(
+                    "status"
+                );
+
+            status.textContent =
+                message;
+
+            status.className =
+                "status";
+
+            if (type) {
+                status.classList.add(type);
+            }
+        }
+
+
+        /*
+         * ==========================================================
+         * HTML ESCAPING
+         * ==========================================================
+         */
+
+        function escapeHtml(value) {
+
+            return String(value)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+
+        function escapeAttribute(value) {
+
+            return escapeHtml(value);
+        }
+
+    </script>
+
+</body>
+</html>
+```
