@@ -193,6 +193,34 @@
           ]
         }
       ]
+    },  
+    {
+      "date": "02.10.2026",
+      "times": [
+        {
+          "time": "18:00",
+          "events": [
+            {
+              "title": "Gebetsstunde & Kinderstunden",
+              "notes": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "04.10.2026",
+      "times": [
+        {
+          "time": "10:00",
+          "events": [
+            {
+              "title": "Tauffest",
+              "notes": ""
+            }
+          ]
+        }
+      ]
     }
   ]
 }
