@@ -36,7 +36,7 @@
           "events": [
             {
               "title": "Gebetsstunde Kinderstunden Jungscharstunde",
-              "notes": ""
+              "notes": " "
             }
           ]
         },
@@ -72,7 +72,16 @@
           "time": "18:00",
           "events": [
             {
-              "title": "Gebetsstunde & Kinderstunden",
+              "title": "Gebetsstunde Kinderstunden Jungscharstunde",
+              "notes": " "
+            }
+          ]
+        },
+        {
+          "time": "19:45",
+          "events": [
+            {
+              "title": "Jugendstunde",
               "notes": ""
             }
           ]
