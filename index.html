@@ -28,25 +28,24 @@
 </div>
 
 
-
 <style>
-
+    /*Xibo Widget CSS*/
     :root {
         /*Farben*/
-        --backround-color: #806b5b;
+        --backround-color: #dec5ad;
         --primary-text-color: black;
         /*Schrift*/
-        --primary-textgroeße: 35px;
-        --textgroeße-datum: 30px;
-        --textgroeße-beschreibung: 25px;
+        --primary-textgroeße: 45px;
+        --textgroeße-datum: 35px;
+        --textgroeße-beschreibung: 40px;
         --textart-default-text: Poppins, Calibri, Arial;
         --textart-default-title: 'Black Mango', Calibri, Arial;
         /*Abstaende und Groeßen*/
-        --daybox-ecke-radius: 25px;
-        --daybox-padding: 20px;
-        --abstand-naechste-daybox: 20px;
-        --breite-wochentag: 280px;
-        --breite-uhrzeit: 200px;
+        --daybox-ecke-radius: 40px;
+        --daybox-padding: 25px;
+        --abstand-naechste-daybox: 25px;
+        --breite-wochentag: 320px;
+        --breite-uhrzeit: 260px;
         --abstand-tag-zu-wochentag: -0.3rem;
         --abstand-beschreibung-zu-titel: -0.3rem;
     }
@@ -64,11 +63,11 @@
         color: var(--primary-text-color);
         /*Abstaende innerhalb*/
         /*Einzeln festlegen:
-        padding-top: 20px;
-        padding-left: 20px;
-        padding-bottom: 20px;
-        padding-right: 20px;
-        */
+    padding-top: 20px;
+    padding-left: 20px;
+    padding-bottom: 20px;
+    padding-right: 20px;
+    */
         padding: var(--daybox-padding);
         border-radius: var(--daybox-ecke-radius);
         /*Abstand unten zur naechsten Box*/
@@ -126,7 +125,7 @@
         flex-direction: column;
         flex-wrap: nowrap;
         align-items: flex-start;
-        /*hyphens: auto;*/
+        hyphens: auto;
     }
 
     .title {
@@ -144,7 +143,7 @@
 </style>
 
 
-
+<!--Xibo Widget Head-->
 <script>
     document.addEventListener("DOMContentLoaded", function () {
 
