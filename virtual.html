@@ -1,0 +1,368 @@
+<!--Container mit Xibo Widget Maßen +120Titel -->
+<div style="background: #d0b7a0; width: 1200; height: 1700">
+   <div style="height: 120; text-align: center; font-family: 'Black Mango'; font-size:60px ">Wochenübersicht</div>
+    
+    <!--Xibo Widget HTML-->
+    <div id="container-days" class="rootHTMLersatz">
+        <div id="day" class="daybox">
+
+            <!-- Linker Bereich: Wochentag und Datum -->
+            <div id="day-info" class="day-info">
+                <p id="weekday" class="weekday">Heute</p>
+                <p id="date" class="date">...</p>
+            </div>
+
+            <!-- Rechter Bereich: Uhrzeit und Termine -->
+            <div id="container-time-events" class="container-time-events">
+
+                <div id="time-event" class="time-event">
+
+                    <p id="time" class="time">...</p>
+
+                    <div id="container-events" class="container-events">
+                        <div id="event" class="event">
+                            <p id="title" class="title">Keine Daten...</p>
+                            <p id="description" class="description"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+<style>
+    /*Xibo Widget CSS*/
+    :root {
+        /*Farben*/
+        --backround-color: #dec5ad;
+        --primary-text-color: black;
+        /*Schrift*/
+        --primary-textgroeße: 45px;
+        --textgroeße-datum: 35px;
+        --textgroeße-beschreibung: 40px;
+        --textart-default-text: Poppins, Calibri, Arial;
+        --textart-default-title: 'Black Mango', Calibri, Arial;
+        /*Abstaende und Groeßen*/
+        --daybox-ecke-radius: 40px;
+        --daybox-padding: 25px;
+        --abstand-naechste-daybox: 25px;
+        --breite-wochentag: 320px;
+        --breite-uhrzeit: 260px;
+        --abstand-tag-zu-wochentag: -0.3rem;
+        --abstand-beschreibung-zu-titel: -0.3rem;
+    }
+
+    .rootHTMLersatz {
+        font-size: var(--primary-textgroeße);
+    }
+
+    .daybox {
+        /*Box Layout*/
+        background-color: var(--backround-color);
+        /*Schriftart*/
+        text-align: left;
+        font-family: var(--textart-default-text);
+        color: var(--primary-text-color);
+        /*Abstaende innerhalb*/
+        /*Einzeln festlegen:
+    padding-top: 20px;
+    padding-left: 20px;
+    padding-bottom: 20px;
+    padding-right: 20px;
+    */
+        padding: var(--daybox-padding);
+        border-radius: var(--daybox-ecke-radius);
+        /*Abstand unten zur naechsten Box*/
+        margin-bottom: var(--abstand-naechste-daybox);
+        /*Anordnung der Elemente innerhalb*/
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        align-items: flex-start;
+    }
+
+        /* Utility: aktueller Tag - Fettformatierung */
+        .daybox.day--today {
+            font-weight: bold;
+        }
+
+    /* Container: Links Uhrzeit, Rechts Events */
+    .day-info {
+        display: flex;
+        flex-direction: column;
+        flex-wrap: nowrap;
+        width: var(--breite-wochentag);
+        flex-shrink: 0;
+    }
+
+    .weekday {
+        margin-top: 0px;
+        margin-bottom: 0px;
+    }
+
+    .date {
+        margin-top: var(--abstand-tag-zu-wochentag);
+        margin-bottom: 0px;
+        font-size: var(--textgroeße-datum);
+    }
+
+    /* Container: Links Uhrzeit, Rechts Events */
+    .time-event {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        align-items: flex-start;
+    }
+
+    .time {
+        margin-top: 0px;
+        margin-bottom: 0px;
+        width: var(--breite-uhrzeit);
+        flex-shrink: 0;
+    }
+
+    /* Container mit Titel und Beschreibung */
+    .event {
+        display: flex;
+        flex-direction: column;
+        flex-wrap: nowrap;
+        align-items: flex-start;
+        hyphens: auto;
+    }
+
+    .title {
+        margin-top: 0px;
+        margin-bottom: 0px;
+    }
+
+
+    .description {
+        margin: 0px;
+        margin-top: var(--abstand-beschreibung-zu-titel);
+        margin-bottom: 0px;
+        font-size: var(--textgroeße-beschreibung);
+    }
+</style>
+
+
+<!--Xibo Widget Head-->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        // Konfiguration
+        // Wenn jsonTestData ein leerer String ist, wird die JSON per URL geladen.
+        // Ansonsten wird der Inhalt von jsonTestData benutzt (Roh-JSON).
+        const jsonUrl = "https://macdeveloping.github.io/1NF0P01N7/wochenuebersicht.json";
+
+        // hier für Tests Rohdaten einfügen
+        let jsonTestData = '';
+        const showDaysCount = 0; // wie viele Tage geprüft werden (wenn >0 gilt dieser Wert)
+        // Schwellwert (Wochentag 0=Sonntag,1=Montag..6=Samstag).
+        // Ab diesem Wochentag wird bis zum übernächsten Sonntag angezeigt.
+        const showNextSundayFrom = 5; // z.B. 5 = ab Freitag erweitern bis übernächsten Sonntag
+        const refreshInterval = 0.1; // Minuten für automatischen Reload (1 = 1 Minute)
+
+        // Template-Elemente (werden als Vorlage verwendet)
+        const originalTemplate = document.getElementById("day");
+        const originalTimeEvent = originalTemplate.querySelector(".time-event");
+        const originalEvent = originalTemplate.querySelector(".event");
+
+        // Container
+        const container = document.getElementById("container-days");
+
+        // Vorlage aus dem DOM entfernen (nur als Template behalten)
+        originalTemplate.remove();
+
+        // Aktuelle angezeigte Daten (für Fallback beim Fehler)
+        let lastData = null;
+        let refreshTimerId = null;
+
+        // Hilfsfunktion: format Date to DD.MM.YYYY
+        function formatDateDot(d) {
+            const dd = String(d.getDate()).padStart(2, '0');
+            const mm = String(d.getMonth() + 1).padStart(2, '0');
+            const yyyy = d.getFullYear();
+            return `${dd}.${mm}.${yyyy}`;
+        }
+
+        // Hilfsfunktion: Tag und Monat formatieren: TT.MM.
+        function formatDayMonth(d) {
+            const dd = String(d.getDate()).padStart(2, '0');
+            const mm = String(d.getMonth() + 1).padStart(2, '0');
+            return `${dd}.${mm}.`;
+        }
+
+        // Hilfsfunktion: Wochentag in Deutsch
+        function weekdayGerman(d) {
+            return d.toLocaleDateString('de-DE', { weekday: 'long' });
+        }
+
+        // JSON laden (von Teststring oder per Fetch)
+        async function loadJson() {
+            if (jsonTestData && jsonTestData.trim() !== "") {
+                try {
+                    return JSON.parse(jsonTestData);
+                } catch (e) {
+                    console.error('jsonTestData kann nicht geparst werden', e);
+                    return null;
+                }
+            }
+
+            try {
+                const resp = await fetch(jsonUrl, { cache: 'no-store' });
+                if (!resp.ok) throw new Error('HTTP ' + resp.status);
+                return await resp.json();
+            } catch (e) {
+                console.error('Fehler beim Laden der JSON:', e);
+                return null;
+            }
+        }
+
+        // Rendern der Tage basierend auf den geladenen Daten
+        function renderFromData(data) {
+            if (!data || !Array.isArray(data.days)) return;
+
+            // Leere Container und fülle neu
+            container.innerHTML = '';
+
+            const today = new Date();
+
+            // Bestimme Anzahl der anzuzeigenden Tage
+            let daysToShow;
+            if (showDaysCount && Number(showDaysCount) > 0) {
+                daysToShow = Number(showDaysCount);
+            } else {
+                // bis zum nächsten Sonntag (inklusive)
+                const daysUntilNextSunday = (7 - today.getDay()) % 7;
+                daysToShow = daysUntilNextSunday + 1;
+
+                // Falls aktueller Wochentag >= showNextSundayFrom, erweitere bis zum übernächsten Sonntag
+                if (typeof showNextSundayFrom !== 'undefined' && Number.isInteger(showNextSundayFrom)) {
+                    if (today.getDay() >= showNextSundayFrom) {
+                        daysToShow += 7; // bis Sonntag nach dem nächsten
+                    }
+                }
+            }
+
+            for (let i = 0; i < daysToShow; i++) {
+                const d = new Date(today);
+                d.setDate(today.getDate() + i);
+                const dateStr = formatDateDot(d);
+
+                // Suche nach Eintrag in JSON
+                const dayObj = data.days.find(x => x.date === dateStr);
+                if (!dayObj) continue; // überspringen wenn keine Daten vorhanden
+
+                // Clone template
+                const clone = originalTemplate.cloneNode(true);
+
+                // Entferne IDs in Clone, damit keine Duplikate entstehen
+                clone.querySelectorAll('[id]').forEach(el => el.removeAttribute('id'));
+
+                // Wochentag und Datum setzen
+                const weekdayEl = clone.querySelector('.weekday');
+                const dateEl = clone.querySelector('.date');
+                if (weekdayEl) weekdayEl.textContent = weekdayGerman(d);
+                if (dateEl) dateEl.textContent = formatDayMonth(d);
+
+                const containerTimeEvents = clone.querySelector('.container-time-events');
+                // Entferne vorhandenes time-event Template im clone
+                containerTimeEvents.innerHTML = '';
+
+                // Zeiten und Events anfügen
+                if (Array.isArray(dayObj.times)) {
+                    dayObj.times.forEach(timeObj => {
+                        const timeClone = originalTimeEvent.cloneNode(true);
+                        // entferne ids
+                        timeClone.querySelectorAll('[id]').forEach(el => el.removeAttribute('id'));
+                        const timeEl = timeClone.querySelector('.time');
+                        const containerEvents = timeClone.querySelector('.container-events');
+                        if (timeEl) timeEl.textContent = (timeObj.time || '') + (timeObj.time ? ' Uhr' : '');
+                        containerEvents.innerHTML = '';
+
+                        if (Array.isArray(timeObj.events)) {
+                            timeObj.events.forEach(ev => {
+                                const evClone = originalEvent.cloneNode(true);
+                                evClone.querySelectorAll('[id]').forEach(el => el.removeAttribute('id'));
+                                const titleEl = evClone.querySelector('.title');
+                                const descrEl = evClone.querySelector('.description');
+                                if (titleEl) titleEl.textContent = ev.title || '';
+                                if (descrEl) descrEl.textContent = ev.notes || '';
+                                containerEvents.appendChild(evClone);
+                            });
+                        }
+
+                        containerTimeEvents.appendChild(timeClone);
+                    });
+                }
+
+                // Sonderfall: Wenn nur eine Uhrzeit und ein Event ohne Beschreibung vorhanden sind,
+                // dann die Inhalte der daybox zentrieren.
+                let centerAlign = false;
+                if (Array.isArray(dayObj.times) && dayObj.times.length === 1) {
+                    const t = dayObj.times[0];
+                    if (Array.isArray(t.events) && t.events.length === 1) {
+                        const e = t.events[0];
+                        if (!e.notes || String(e.notes).trim() === '') centerAlign = true;
+                    }
+                }
+
+                if (centerAlign) {
+                    clone.style.alignItems = 'center';
+                }
+
+                // Falls der erste dargestellte Tag (oberste Box) dem aktuellen Tag entspricht,
+                // Schrift fett darstellen.
+                if (i === 0) {
+                    const todayStr = formatDateDot(new Date());
+                    if (dayObj.date === todayStr) {
+                        clone.classList.add('day--today');
+                    }
+                }
+
+                container.appendChild(clone);
+            }
+        }
+
+        // Lädt JSON, rendert und steuert Refresh-Intervall
+        async function loadAndRender() {
+            const data = await loadJson();
+            if (data) {
+                // Daten erfolgreich geladen
+                lastData = data;
+                renderFromData(data);
+
+                // Refresh-Intervall (konfiguriert durch refreshInterval)
+                if (refreshInterval && Number(refreshInterval) > 0) {
+                    const ms = Number(refreshInterval) * 60 * 1000;
+                    if (refreshTimerId) clearInterval(refreshTimerId);
+                    refreshTimerId = setInterval(async () => {
+                        const newData = await loadJson();
+                        if (newData) {
+                            lastData = newData;
+                            renderFromData(newData);
+                        } else {
+                            console.warn('Refresh: Keine neuen Daten geladen, benutze letzte Daten.');
+                        }
+                    }, ms);
+                }
+            } else {
+                // Fehler beim Laden -> Falls wir bereits Daten haben, bleibt Anzeige bestehen
+                if (lastData) {
+                    console.warn('Benutze letzte bekannte Daten wegen Ladefehler.');
+                } else {
+                    console.error('Keine Daten zum Anzeigen verfügbar.');
+                }
+            }
+        }
+
+        // Initialer Aufruf
+        loadAndRender();
+    });
+</script>
