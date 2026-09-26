@@ -151,6 +151,8 @@
         // Wenn jsonTestData ein leerer String ist, wird die JSON per URL geladen.
         // Ansonsten wird der Inhalt von jsonTestData benutzt (Roh-JSON).
         const jsonUrl = "https://macdeveloping.github.io/1NF0P01N7/wochenuebersicht.json";
+        // Optional: webcal published calendar (wenn gesetzt, wird webcal zuerst geladen)
+        const webcalUrl = 'webcal://p150-caldav.icloud.com/published/2/MTY3NzY0NjYzNTAxNjc3Nqu3gRJSSyusenXaHs1S8wAaM85I_o347Upo2DZpM4t9pW9DZpA-DST2Kw3I-RFHeXTzd-kOnZQRpATfZ04Xrrg';
 
         // hier für Tests Rohdaten einfügen
         let jsonTestData = '';
@@ -205,6 +207,12 @@
                     return null;
                 }
             }
+            // wenn webcalUrl gesetzt ist, versuche zuerst Kalender zu laden und zu parsen
+            if (typeof webcalUrl === 'string' && webcalUrl.trim().length > 0 && webcalUrl.startsWith('webcal:')) {
+                const parsed = await loadFromWebcal(webcalUrl);
+                if (parsed) return parsed;
+                // fallback to JSON URL on failure
+            }
 
             try {
                 const resp = await fetch(jsonUrl, { cache: 'no-store' });
@@ -214,6 +222,167 @@
                 console.error('Fehler beim Laden der JSON:', e);
                 return null;
             }
+        }
+
+
+        /* ==========================================================
+           Webcal / iCal -> JSON Konverter
+           Lädt eine webcal (webcal:// -> https://), parst VEVENTs,
+           expanded für die nächsten 3 Wochen ab heute und gibt
+           ein JSON-Objekt im vorhandenen Schema zurück.
+           ========================================================== */
+
+        async function loadFromWebcal(url) {
+            try {
+                const httpsUrl = url.replace(/^webcal:/i, 'https:');
+                const resp = await fetch(httpsUrl, { cache: 'no-store' });
+                if (!resp.ok) throw new Error('HTTP ' + resp.status);
+                let text = await resp.text();
+
+                // Unfold folded lines (RFC5545)
+                text = text.replace(/\r?\n[ \t]/g, '');
+
+                const events = parseICal(text);
+
+                const start = new Date(); start.setHours(0,0,0,0);
+                const end = new Date(start); end.setDate(end.getDate() + 21); // 3 Wochen
+
+                const occ = expandEvents(events, start, end);
+
+                // Group by date and time
+                const daysMap = new Map();
+
+                occ.forEach(o => {
+                    const d = o.date;
+                    const dayKey = formatDateDot(d);
+                    const timeKey = o.allDay ? '' : pad(d.getHours()) + ':' + pad(d.getMinutes());
+
+                    if (!daysMap.has(dayKey)) daysMap.set(dayKey, new Map());
+                    const times = daysMap.get(dayKey);
+                    if (!times.has(timeKey)) times.set(timeKey, []);
+                    times.get(timeKey).push({ title: o.summary || '', notes: o.description || '' });
+                });
+
+                // Convert to array sorted by date and time
+                const days = Array.from(daysMap.keys()).sort((a,b)=>{
+                    const pa = parseDateDot(a), pb = parseDateDot(b);
+                    return pa - pb;
+                }).map(dayKey => {
+                    const timesMap = daysMap.get(dayKey);
+                    const timesArr = Array.from(timesMap.keys()).sort((a,b)=>{
+                        if (a === '') return -1;
+                        if (b === '') return 1;
+                        return a.localeCompare(b);
+                    }).map(timeKey => {
+                        const events = timesMap.get(timeKey);
+                        // apply priority ordering for special events
+                        events.sort((x,y)=> eventPriority(x.title) - eventPriority(y.title) || x.title.localeCompare(y.title));
+                        return { time: timeKey, events };
+                    });
+                    return { date: dayKey, times: timesArr };
+                });
+
+                const json = { days };
+                // validate basic shape
+                if (!json || !Array.isArray(json.days)) throw new Error('Parsed JSON invalid');
+                return json;
+
+            } catch (err) {
+                console.error('Webcal load error', err);
+                return null;
+            }
+        }
+
+        function pad(n) { return String(n).padStart(2,'0'); }
+
+        function eventPriority(title) {
+            const t = (title||'').toLowerCase();
+            if (t.includes('gebetsstunde') || t.includes('gebetskreis')) return 0;
+            if (t.includes('kinderstunde') || t.includes('kinderstunden') || t.includes('kinder')) return 1;
+            if (t.includes('jungschar') || t.includes('jungscharstunde')) return 2;
+            return 99;
+        }
+
+        function parseICal(text) {
+            const events = [];
+            const parts = text.split(/BEGIN:VEVENT/).slice(1);
+            parts.forEach(part => {
+                const block = part.split(/END:VEVENT/)[0];
+                const ev = {};
+                const get = (name) => {
+                    const re = new RegExp(name + '(?:;[^:]*)?:([^\r\n]+)', 'i');
+                    const m = block.match(re);
+                    return m ? m[1].trim() : null;
+                };
+                ev.dtstart = get('DTSTART');
+                ev.dtend = get('DTEND');
+                ev.summary = get('SUMMARY') || '';
+                ev.description = get('DESCRIPTION') || '';
+                ev.rrule = get('RRULE');
+                ev.allDay = !!(ev.dtstart && /^\d{8}$/.test(ev.dtstart));
+                if (ev.dtstart) ev._dt = parseICalDate(ev.dtstart);
+                events.push(ev);
+            });
+            return events;
+        }
+
+        function parseICalDate(s) {
+            const clean = s.split(';').pop();
+            if (/^\d{8}$/.test(clean)) {
+                const y = Number(clean.substr(0,4));
+                const m = Number(clean.substr(4,2)) - 1;
+                const d = Number(clean.substr(6,2));
+                return new Date(y,m,d);
+            }
+            // format like YYYYMMDDTHHMMSSZ or without Z
+            const m = clean.match(/(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})Z?/);
+            if (m) return new Date(Date.UTC(Number(m[1]), Number(m[2]) -1, Number(m[3]), Number(m[4]), Number(m[5]), Number(m[6])));
+            const iso = clean.replace(/^(\d{8})T(\d{6})Z$/, function(_,d,t){
+                return d.substr(0,4) + '-' + d.substr(4,2) + '-' + d.substr(6,2) + 'T' + t.substr(0,2) + ':' + t.substr(2,2) + ':' + t.substr(4,2) + 'Z';
+            }).replace(/^(\d{8})T(\d{6})$/, function(_,d,t){
+                return d.substr(0,4) + '-' + d.substr(4,2) + '-' + d.substr(6,2) + 'T' + t.substr(0,2) + ':' + t.substr(2,2) + ':' + t.substr(4,2);
+            });
+            const dt = new Date(iso);
+            if (!isNaN(dt)) return dt;
+            return null;
+        }
+
+        function expandEvents(events, rangeStart, rangeEnd) {
+            const occ = [];
+            events.forEach(ev => {
+                if (!ev._dt) return;
+                if (!ev.rrule) {
+                    // single event
+                    if (ev._dt >= rangeStart && ev._dt <= rangeEnd) occ.push({ date: ev._dt, summary: ev.summary, description: ev.description, allDay: ev.allDay });
+                } else {
+                    // basic RRULE handling for WEEKLY with BYDAY
+                    const rule = {};
+                    ev.rrule.split(';').forEach(p=>{ const [k,v]=p.split('='); if(k&&v) rule[k.toUpperCase()]=v; });
+                    const freq = (rule.FREQ||'').toUpperCase();
+                    if (freq === 'WEEKLY') {
+                        const byday = rule.BYDAY ? rule.BYDAY.split(',') : null;
+                        const map = {MO:1,TU:2,WE:3,TH:4,FR:5,SA:6,SU:0};
+                        const weekdays = byday ? byday.map(d=>map[d]||null).filter(x=>x!==null) : null;
+
+                        // iterate each day in range
+                        const it = new Date(rangeStart);
+                        while (it <= rangeEnd) {
+                            if (!weekdays || weekdays.includes(it.getDay())) {
+                                // create occurrence at time of original event
+                                const instance = new Date(it.getFullYear(), it.getMonth(), it.getDate(), ev._dt.getHours(), ev._dt.getMinutes(), ev._dt.getSeconds());
+                                if (instance >= ev._dt && instance >= rangeStart && instance <= rangeEnd) {
+                                    occ.push({ date: instance, summary: ev.summary, description: ev.description, allDay: ev.allDay });
+                                }
+                            }
+                            it.setDate(it.getDate() + 1);
+                        }
+                    } else {
+                        // fallback: include original if in range
+                        if (ev._dt >= rangeStart && ev._dt <= rangeEnd) occ.push({ date: ev._dt, summary: ev.summary, description: ev.description, allDay: ev.allDay });
+                    }
+                }
+            });
+            return occ;
         }
 
         // Rendern der Tage basierend auf den geladenen Daten
