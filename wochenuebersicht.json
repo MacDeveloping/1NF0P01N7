@@ -140,15 +140,7 @@
           "time": "18:00",
           "events": [
             {
-              "title": "Gebetsstunde",
-              "notes": ""
-            },
-            {
-              "title": "Kinderstunden",
-              "notes": ""
-            },
-            {
-              "title": "Jungscharstunde",
+              "title": "Gebetsstunde, Kinderstunden, Jungscharstunde",
               "notes": ""
             }
           ]
@@ -209,7 +201,7 @@
           "events": [
             {
               "title": "Bibelstunde",
-              "notes": "Stukenbrock"
+              "notes": ""
             }
           ]
         }
@@ -222,15 +214,7 @@
           "time": "18:00",
           "events": [
             {
-              "title": "Gebetsstunde",
-              "notes": ""
-            },
-            {
-              "title": "Kinderstunden",
-              "notes": ""
-            },
-            {
-              "title": "Jungscharstunde",
+              "title": "Gebetsstunde, Kinderstunden, Jungscharstunde",
               "notes": ""
             }
           ]
@@ -267,7 +251,7 @@
           "events": [
             {
               "title": "Gottesdienst",
-              "notes": "Schloss Holte - Bericht Einsatz in Ostdeutschland"
+              "notes": "Schloss Holte - Bericht Ev. Einsatz Ostdeutschland"
             }
           ]
         }
