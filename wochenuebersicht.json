@@ -183,20 +183,25 @@
           ]
         },
         {
-          "time": "17:30",
-          "events": [
-            {
-              "title": "Kükenchor",
-              "notes": "Schloss Holte & Stukenbrock (2018-2021)"
-            }
-          ]
-        },
-        {
           "time": "17:45",
           "events": [
             {
               "title": "Elterngebetskreis",
               "notes": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "06.10.2026",
+      "times": [
+        {
+          "time": "17:30",
+          "events": [
+            {
+              "title": "Kükenchor",
+              "notes": "Schloss Holte & Stukenbrock (Jg.2018-2021)"
             }
           ]
         }
