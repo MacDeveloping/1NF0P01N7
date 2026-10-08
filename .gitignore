@@ -8,6 +8,8 @@
 ._virtual.html
 ._*.html
 
+wochenuebersicht.json
+
 # User-specific files
 *.rsuser
 *.suo
