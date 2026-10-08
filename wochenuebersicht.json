@@ -284,6 +284,117 @@
           ]
         }
       ]
+    },
+    {
+      "date": "12.10.2026",
+      "times": [
+        {
+          "time": "10:00",
+          "events": [
+            {
+              "title": "Gebetskreis",
+              "notes": ""
+            }
+          ]
+        },
+        {
+          "time": "17:45",
+          "events": [
+            {
+              "title": "Elterngebetskreis",
+              "notes": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "14.10.2026",
+      "times": [
+        {
+          "time": "19:00",
+          "events": [
+            {
+              "title": "Elternversammlung",
+              "notes": "Schloss Holte"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "15.10.2026",
+      "times": [
+        {
+          "time": "19:00",
+          "events": [
+            {
+              "title": "Schwesterngebetskreis",
+              "notes": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "16.10.2026",
+      "times": [
+        {
+          "time": "18:00",
+          "events": [
+            {
+              "title": "Gebetsstunde, Kinderstunden, Jungscharstunde",
+              "notes": ""
+            }
+          ]
+        },
+        {
+          "time": "19:45",
+          "events": [
+            {
+              "title": "Jugendstunde",
+              "notes": "Schloss Holte"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "17.10.2026",
+      "times": [
+        {
+          "time": "10:00",
+          "events": [
+            {
+              "title": "Missionskonferenz",
+              "notes": "Aschaffenburg"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "18.10.2026",
+      "times": [
+        {
+          "time": "10:00",
+          "events": [
+            {
+              "title": "Gottesdienst",
+              "notes": "Schloss Holte & Stukenbrock"
+            }
+          ]
+        },
+        {
+          "time": "16:00",
+          "events": [
+            {
+              "title": "Gottesdienst",
+              "notes": "Schloss Holte - Br. Iljuscha aus Ukraine"
+            }
+          ]
+        }
+      ]
     }
   ]
 }
