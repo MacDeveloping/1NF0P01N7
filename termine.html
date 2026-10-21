@@ -9,25 +9,9 @@
         <!-- Darunter: Verschiedene Termine -->
         <div id="container-events" class="container-events">
             <div id="event" class="event">
-                <p id="date" class="date">11. September 2026</p>
-                <p id="title" class="title">Titelfüller</p>
-                <p id="description" class="description">Keine Daten...</p>
-            </div>
-        </div>
-
-        <div id="container-events" class="container-events">
-            <div id="event" class="event">
-                <p id="date" class="date">13.-15. September 2026</p>
-                <p id="title" class="title">Titel</p>
-                <p id="description" class="description"></p>
-            </div>
-        </div>
-
-        <div id="container-events" class="container-events">
-            <div id="event" class="event">
-                <p id="date" class="date">30. Apr - 05. Mai 2026</p>
+                <p id="date" class="date">00. Monat</p>
                 <p id="title" class="title">Keine Daten...</p>
-                <p id="description" class="description">Keine Daten...</p>
+                <p id="description" class="description"></p>
             </div>
         </div>
     </div>
@@ -50,7 +34,7 @@
         --daybox-ecke-radius: 40px;
         --daybox-padding: 25px;
         --abstand-naechste-daybox: 25px;
-        --abstand-year-zu-events: 20px;
+        --abstand-year-zu-events: 0px;
         --abstand-event-zu-event: 10px;
         --abstand-titel-zu-datum: -5px;
         --abstand-beschreibung-zu-titel: -5px;
@@ -122,7 +106,6 @@
         margin-top: var(--abstand-beschreibung-zu-titel);
         margin-bottom: 0px;
         font-size: var(--textgroeße-beschreibung);
-        
     }
 </style>
 
@@ -130,220 +113,237 @@
 <!--Xibo Widget Head-->
 <script>
     document.addEventListener("DOMContentLoaded", function () {
+        // URL der JSON-Datei für die Terminübersicht
+        const jsonUrl = "https://macdeveloping.github.io/1NF0P01N7/termine.json";
 
-        // Konfiguration
-        // Wenn jsonTestData ein leerer String ist, wird die JSON per URL geladen.
-        // Ansonsten wird der Inhalt von jsonTestData benutzt (Roh-JSON).
-        const jsonUrl = "https://macdeveloping.github.io/1NF0P01N7/wochenuebersicht.json";
-
-        // hier für Tests Rohdaten einfügen
+        // Für Tests hier optional Roh-JSON eintragen.
         let jsonTestData = '';
-        const showDaysCount = 0; // wie viele Tage geprüft werden (wenn >0 gilt dieser Wert)
-        // Schwellwert (Wochentag 0=Sonntag,1=Montag..6=Samstag).
-        // Ab diesem Wochentag wird bis zum übernächsten Sonntag angezeigt.
-        const showNextSundayFrom = 5; // z.B. 5 = ab Freitag erweitern bis übernächsten Sonntag
-        const refreshInterval = 0.1; // Minuten für automatischen Reload (1 = 1 Minute)
+        const refreshInterval = 0.1; // Minuten; 0 deaktiviert den automatischen Reload
 
-        // Template-Elemente (werden als Vorlage verwendet)
-        const originalTemplate = document.getElementById("day");
-        const originalTimeEvent = originalTemplate.querySelector(".time-event");
-        const originalEvent = originalTemplate.querySelector(".event");
+        const containerYears = document.getElementById("container-years");
+        const originalYearbox = containerYears.querySelector(".yearbox");
+        const originalEvent = originalYearbox.querySelector(".event");
 
-        // Container
-        const container = document.getElementById("container-days");
+        if (!containerYears || !originalYearbox || !originalEvent) {
+            console.error("Terminvorlage nicht gefunden.");
+            return;
+        }
 
-        // Vorlage aus dem DOM entfernen (nur als Template behalten)
-        originalTemplate.remove();
+        // Vorlagen merken und die ursprüngliche Beispiel-Box ausblenden/entfernen.
+        const originalYearboxTemplate = originalYearbox.cloneNode(true);
+        const originalEventTemplate = originalEvent.cloneNode(true);
+        originalYearbox.remove();
 
-        // Aktuelle angezeigte Daten (für Fallback beim Fehler)
         let lastData = null;
         let refreshTimerId = null;
 
-        // Hilfsfunktion: format Date to DD.MM.YYYY
-        function formatDateDot(d) {
-            const dd = String(d.getDate()).padStart(2, '0');
-            const mm = String(d.getMonth() + 1).padStart(2, '0');
-            const yyyy = d.getFullYear();
-            return `${dd}.${mm}.${yyyy}`;
+        // Erwartetes Datumsformat der JSON: TT.MM.JJJJ
+        function parseGermanDate(value) {
+            if (typeof value !== "string") return null;
+            const match = value.trim().match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/);
+            if (!match) return null;
+
+            const day = Number(match[1]);
+            const month = Number(match[2]);
+            const year = Number(match[3]);
+            const date = new Date(year, month - 1, day);
+
+            // Ungültige Daten wie 31.02.2026 abfangen.
+            if (date.getFullYear() !== year ||
+                date.getMonth() !== month - 1 ||
+                date.getDate() !== day) return null;
+
+            return date;
         }
 
-        // Hilfsfunktion: Tag und Monat formatieren: TT.MM.
-        function formatDayMonth(d) {
-            const dd = String(d.getDate()).padStart(2, '0');
-            const mm = String(d.getMonth() + 1).padStart(2, '0');
-            return `${dd}.${mm}.`;
+        const germanMonths = [
+            "Januar", "Februar", "März", "April", "Mai", "Juni",
+            "Juli", "August", "September", "Oktober", "November", "Dezember"
+        ];
+        const shortMonths = [
+            "Jan", "Feb", "Mär", "Apr", "Mai", "Jun",
+            "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"
+        ];
+
+        function dayNumber(date) {
+            return String(date.getDate()).padStart(2, "0");
         }
 
-        // Hilfsfunktion: Wochentag in Deutsch
-        function weekdayGerman(d) {
-            return d.toLocaleDateString('de-DE', { weekday: 'long' });
+        // Datum ohne Jahr für cluster_mode "year".
+        function formatDateYearMode(start, end) {
+            if (start.getTime() === end.getTime()) {
+                return `${dayNumber(start)}. ${germanMonths[start.getMonth()]}`;
+            }
+
+            if (start.getMonth() === end.getMonth() &&
+                start.getFullYear() === end.getFullYear()) {
+                return `${dayNumber(start)}.-${dayNumber(end)}. ${germanMonths[end.getMonth()]}`;
+            }
+
+            return `${dayNumber(start)}. ${shortMonths[start.getMonth()]} - ${dayNumber(end)}. ${shortMonths[end.getMonth()]}`;
         }
 
-        // JSON laden (von Teststring oder per Fetch)
+        // Datum mit Jahr für cluster_mode "event"; das Jahr stammt vom Enddatum.
+        function formatDateEventMode(start, end) {
+            const year = end.getFullYear();
+
+            if (start.getTime() === end.getTime()) {
+                return `${dayNumber(start)}. ${germanMonths[start.getMonth()]} ${year}`;
+            }
+
+            if (start.getMonth() === end.getMonth() &&
+                start.getFullYear() === end.getFullYear()) {
+                return `${dayNumber(start)}.-${dayNumber(end)}. ${germanMonths[end.getMonth()]} ${year}`;
+            }
+
+            return `${dayNumber(start)}. ${shortMonths[start.getMonth()]} - ${dayNumber(end)}. ${shortMonths[end.getMonth()]} ${year}`;
+        }
+
         async function loadJson() {
             if (jsonTestData && jsonTestData.trim() !== "") {
                 try {
                     return JSON.parse(jsonTestData);
                 } catch (e) {
-                    console.error('jsonTestData kann nicht geparst werden', e);
+                    console.error("jsonTestData kann nicht geparst werden:", e);
                     return null;
                 }
             }
 
             try {
-                const resp = await fetch(jsonUrl, { cache: 'no-store' });
-                if (!resp.ok) throw new Error('HTTP ' + resp.status);
-                return await resp.json();
+                const response = await fetch(jsonUrl, { cache: "no-store" });
+                if (!response.ok) throw new Error("HTTP " + response.status);
+                return await response.json();
             } catch (e) {
-                console.error('Fehler beim Laden der JSON:', e);
+                console.error("Fehler beim Laden der Termin-JSON:", e);
                 return null;
             }
         }
 
-        // Rendern der Tage basierend auf den geladenen Daten
-        function renderFromData(data) {
-            if (!data || !Array.isArray(data.days)) return;
+        function makeEvent(eventData, mode) {
+            const eventBox = originalEventTemplate.cloneNode(true);
+            eventBox.querySelectorAll("[id]").forEach(el => el.removeAttribute("id"));
 
-            // Leere Container und fülle neu
-            container.innerHTML = '';
+            const dateEl = eventBox.querySelector(".date");
+            const titleEl = eventBox.querySelector(".title");
+            const descriptionEl = eventBox.querySelector(".description");
 
-            const today = new Date();
+            const start = parseGermanDate(eventData.date_start);
+            const end = parseGermanDate(eventData.date_end);
 
-            // Bestimme Anzahl der anzuzeigenden Tage
-            let daysToShow;
-            if (showDaysCount && Number(showDaysCount) > 0) {
-                daysToShow = Number(showDaysCount);
-            } else {
-                // bis zum nächsten Sonntag (inklusive)
-                const daysUntilNextSunday = (7 - today.getDay()) % 7;
-                // Wenn heute Sonntag ist, soll die komplette Woche angezeigt werden
-                if (daysUntilNextSunday === 0) {
-                    daysToShow = 8;
+            if (dateEl) {
+                if (start && end) {
+                    dateEl.textContent = mode === "event"
+                        ? formatDateEventMode(start, end)
+                        : formatDateYearMode(start, end);
                 } else {
-                    daysToShow = daysUntilNextSunday + 1;
-                }
-
-                // Falls aktueller Wochentag >= showNextSundayFrom, erweitere bis zum übernächsten Sonntag
-                if (typeof showNextSundayFrom !== 'undefined' && Number.isInteger(showNextSundayFrom)) {
-                    if (today.getDay() >= showNextSundayFrom) {
-                        daysToShow += 7; // bis Sonntag nach dem nächsten
-                    }
+                    dateEl.textContent = "Ungültiges Datum";
+                    console.warn("Ungültiges date_start/date_end bei Termin:", eventData);
                 }
             }
 
-            for (let i = 0; i < daysToShow; i++) {
-                const d = new Date(today);
-                d.setDate(today.getDate() + i);
-                const dateStr = formatDateDot(d);
+            if (titleEl) titleEl.textContent = eventData.title || "";
+            if (descriptionEl) descriptionEl.textContent = eventData.notes || "";
 
-                // Suche nach Eintrag in JSON
-                const dayObj = data.days.find(x => x.date === dateStr);
-                if (!dayObj) continue; // überspringen wenn keine Daten vorhanden
+            return eventBox;
+        }
 
-                // Clone template
-                const clone = originalTemplate.cloneNode(true);
+        function makeYearbox(year, events, mode) {
+            const yearbox = originalYearboxTemplate.cloneNode(true);
+            yearbox.querySelectorAll("[id]").forEach(el => el.removeAttribute("id"));
 
-                // Entferne IDs in Clone, damit keine Duplikate entstehen
-                clone.querySelectorAll('[id]').forEach(el => el.removeAttribute('id'));
+            const yearEl = yearbox.querySelector(".year");
+            const eventContainers = yearbox.querySelectorAll(".container-events");
+            const eventsContainer = eventContainers[0];
 
-                // Wochentag und Datum setzen
-                const weekdayEl = clone.querySelector('.weekday');
-                const dateEl = clone.querySelector('.date');
-                if (weekdayEl) weekdayEl.textContent = weekdayGerman(d);
-                if (dateEl) dateEl.textContent = formatDayMonth(d);
+            // Nur einen container-events pro yearbox verwenden.
+            eventContainers.forEach((element, index) => {
+                if (index > 0) element.remove();
+            });
 
-                const containerTimeEvents = clone.querySelector('.container-time-events');
-                // Entferne vorhandenes time-event Template im clone
-                containerTimeEvents.innerHTML = '';
-
-                // Zeiten und Events anfügen
-                if (Array.isArray(dayObj.times)) {
-                    dayObj.times.forEach(timeObj => {
-                        const timeClone = originalTimeEvent.cloneNode(true);
-                        // entferne ids
-                        timeClone.querySelectorAll('[id]').forEach(el => el.removeAttribute('id'));
-                        const timeEl = timeClone.querySelector('.time');
-                        const containerEvents = timeClone.querySelector('.container-events');
-                        if (timeEl) timeEl.textContent = (timeObj.time || '') + (timeObj.time ? ' Uhr' : '');
-                        containerEvents.innerHTML = '';
-
-                        if (Array.isArray(timeObj.events)) {
-                            timeObj.events.forEach(ev => {
-                                const evClone = originalEvent.cloneNode(true);
-                                evClone.querySelectorAll('[id]').forEach(el => el.removeAttribute('id'));
-                                const titleEl = evClone.querySelector('.title');
-                                const descrEl = evClone.querySelector('.description');
-                                if (titleEl) titleEl.textContent = ev.title || '';
-                                if (descrEl) descrEl.textContent = ev.notes || '';
-                                containerEvents.appendChild(evClone);
-                            });
-                        }
-
-                        containerTimeEvents.appendChild(timeClone);
-                    });
+            if (yearEl) {
+                if (mode === "event") {
+                    yearEl.remove();
+                } else {
+                    yearEl.textContent = String(year);
                 }
+            }
 
-                // Sonderfall: Wenn nur eine Uhrzeit und ein Event ohne Beschreibung vorhanden sind,
-                // dann die Inhalte der daybox zentrieren.
-                let centerAlign = false;
-                if (Array.isArray(dayObj.times) && dayObj.times.length === 1) {
-                    const t = dayObj.times[0];
-                    if (Array.isArray(t.events) && t.events.length === 1) {
-                        const e = t.events[0];
-                        if (!e.notes || String(e.notes).trim() === '') centerAlign = true;
-                    }
+            if (eventsContainer) {
+                eventsContainer.innerHTML = "";
+                events.forEach(eventData => {
+                    eventsContainer.appendChild(makeEvent(eventData, mode));
+                });
+            }
+
+            return yearbox;
+        }
+
+        function renderFromData(data) {
+            if (!data || !Array.isArray(data.events)) {
+                console.error('Die JSON muss ein Array "events" enthalten.');
+                return;
+            }
+
+            const mode = data.cluster_mode === "event" ? "event" : "year";
+            containerYears.innerHTML = "";
+
+            const validEvents = data.events.map(eventData => {
+                const start = parseGermanDate(eventData.date_start);
+                const end = parseGermanDate(eventData.date_end);
+                return { eventData, start, end };
+            }).filter(item => {
+                if (!item.start || !item.end) {
+                    console.warn("Termin wegen ungültigem Datum übersprungen:", item.eventData);
+                    return false;
                 }
-
-                if (centerAlign) {
-                    clone.style.alignItems = 'center';
+                if (item.end < item.start) {
+                    console.warn("Termin mit Enddatum vor Startdatum übersprungen:", item.eventData);
+                    return false;
                 }
+                return true;
+            });
 
-                // Falls der erste dargestellte Tag (oberste Box) dem aktuellen Tag entspricht,
-                // Schrift fett darstellen.
-                if (i === 0) {
-                    const todayStr = formatDateDot(new Date());
-                    if (dayObj.date === todayStr) {
-                        clone.classList.add('day--today');
-                    }
-                }
+            // Chronologisch sortieren, bei gleichem Startdatum Reihenfolge beibehalten.
+            validEvents.sort((a, b) => a.start - b.start);
 
-                container.appendChild(clone);
+            if (mode === "event") {
+                validEvents.forEach(item => {
+                    containerYears.appendChild(makeYearbox(
+                        item.end.getFullYear(),
+                        [item.eventData],
+                        "event"
+                    ));
+                });
+            } else {
+                const groups = new Map();
+                validEvents.forEach(item => {
+                    const year = item.start.getFullYear();
+                    if (!groups.has(year)) groups.set(year, []);
+                    groups.get(year).push(item.eventData);
+                });
+
+                Array.from(groups.keys()).sort((a, b) => a - b).forEach(year => {
+                    containerYears.appendChild(makeYearbox(year, groups.get(year), "year"));
+                });
             }
         }
 
-        // Lädt JSON, rendert und steuert Refresh-Intervall
         async function loadAndRender() {
             const data = await loadJson();
             if (data) {
-                // Daten erfolgreich geladen
                 lastData = data;
                 renderFromData(data);
-
-                // Refresh-Intervall (konfiguriert durch refreshInterval)
-                if (refreshInterval && Number(refreshInterval) > 0) {
-                    const ms = Number(refreshInterval) * 60 * 1000;
-                    if (refreshTimerId) clearInterval(refreshTimerId);
-                    refreshTimerId = setInterval(async () => {
-                        const newData = await loadJson();
-                        if (newData) {
-                            lastData = newData;
-                            renderFromData(newData);
-                        } else {
-                            console.warn('Refresh: Keine neuen Daten geladen, benutze letzte Daten.');
-                        }
-                    }, ms);
-                }
+            } else if (lastData) {
+                console.warn("Ladefehler: Die letzte erfolgreiche Anzeige bleibt bestehen.");
             } else {
-                // Fehler beim Laden -> Falls wir bereits Daten haben, bleibt Anzeige bestehen
-                if (lastData) {
-                    console.warn('Benutze letzte bekannte Daten wegen Ladefehler.');
-                } else {
-                    console.error('Keine Daten zum Anzeigen verfügbar.');
-                }
+                console.error("Keine Termindaten zum Anzeigen verfügbar.");
             }
         }
 
-        // Initialer Aufruf
         loadAndRender();
+
+        if (refreshInterval && Number(refreshInterval) > 0) {
+            refreshTimerId = setInterval(loadAndRender, Number(refreshInterval) * 60 * 1000);
+        }
     });
 </script>

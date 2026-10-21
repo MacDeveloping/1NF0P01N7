@@ -1,14 +1,15 @@
 {
-  "days": [
+  "cluster_mode": "year",
+  "events": [
     {
-      "date": "04.12.2026",
-      "date-end": "05.12.2026",
+      "date_start": "05.12.2026",
+      "date_end": "05.12.2026",
       "title": "Adventssingen",
       "notes": "Schloss Holte"
     },
     {
-      "date": "08.12.2026",
-      "date-end": "",
+      "date_start": "08.12.2026",
+      "date_end": "08.12.2026",
       "title": "Adventssingen",
       "notes": "Stukenbrock"
     }
