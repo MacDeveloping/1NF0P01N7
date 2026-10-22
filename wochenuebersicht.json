@@ -1,228 +1,7 @@
 {
   "days": [
     {
-      "date": "21.09.2026",
-      "times": [
-        {
-          "time": "10:00",
-          "events": [
-            {
-              "title": "Gebetskreis",
-              "notes": ""
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "date": "23.09.2026",
-      "times": [
-        {
-          "time": "19:00",
-          "events": [
-            {
-              "title": "Gemeindestunde",
-              "notes": ""
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "date": "25.09.2026",
-      "times": [
-        {
-          "time": "18:00",
-          "events": [
-            {
-              "title": "Gebetsstunde",
-              "notes": ""
-            },
-            {
-              "title": "Kinderstunden",
-              "notes": ""
-            },
-            {
-              "title": "Jungscharstunde",
-              "notes": ""
-            }
-          ]
-        },
-        {
-          "time": "19:45",
-          "events": [
-            {
-              "title": "Jugendstunde",
-              "notes": ""
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "date": "27.09.2026",
-      "times": [
-        {
-          "time": "10:00",
-          "events": [
-            {
-              "title": "Erntedankfest",
-              "notes": "Schloss Holte & Stukenbrock"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "date": "28.09.2026",
-      "times": [
-        {
-          "time": "10:00",
-          "events": [
-            {
-              "title": "Gebetskreis",
-              "notes": ""
-            }
-          ]
-        },
-        {
-          "time": "17:45",
-          "events": [
-            {
-              "title": "Elterngebetskreis",
-              "notes": ""
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "date": "30.09.2026",
-      "times": [
-        {
-          "time": "19:00",
-          "events": [
-            {
-              "title": "Gemeindestunde",
-              "notes": "Schloss Holte"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "date": "01.10.2026",
-      "times": [
-        {
-          "time": "19:00",
-          "events": [
-            {
-              "title": "Schwesterngebetskreis",
-              "notes": ""
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "date": "02.10.2026",
-      "times": [
-        {
-          "time": "",
-          "events": [
-            {
-              "title": "Fasttag",
-              "notes": "Tauffest & Täuflinge Apg.11,23"
-            }
-          ]
-        },
-        {
-          "time": "18:00",
-          "events": [
-            {
-              "title": "Gebetsstunde, Kinderstunden, Jungscharstunde",
-              "notes": ""
-            }
-          ]
-        },
-        {
-          "time": "19:45",
-          "events": [
-            {
-              "title": "Jugendstunde",
-              "notes": ""
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "date": "04.10.2026",
-      "times": [
-        {
-          "time": "10:00",
-          "events": [
-            {
-              "title": "Tauffest",
-              "notes": "Eingliederung & Abendmahl"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "date": "05.10.2026",
-      "times": [
-        {
-          "time": "10:00",
-          "events": [
-            {
-              "title": "Gebetskreis",
-              "notes": ""
-            }
-          ]
-        },
-        {
-          "time": "17:45",
-          "events": [
-            {
-              "title": "Elterngebetskreis",
-              "notes": ""
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "date": "06.10.2026",
-      "times": [
-        {
-          "time": "17:30",
-          "events": [
-            {
-              "title": "Kükenchor",
-              "notes": "Schloss Holte & Stukenbrock (Jg.2018-2021)"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "date": "07.10.2026",
-      "times": [
-        {
-          "time": "19:00",
-          "events": [
-            {
-              "title": "Bibelstunde",
-              "notes": ""
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "date": "09.10.2026",
+      "date": "23.10.2026",
       "times": [
         {
           "time": "18:00",
@@ -238,32 +17,14 @@
           "events": [
             {
               "title": "Jugendstunde",
-              "notes": "Schloss Holte"
-            },
-            {
-              "title": "Jungverheiratete",
-              "notes": "Stukenbrock"
+              "notes": ""
             }
           ]
         }
       ]
     },
     {
-      "date": "10.10.2026",
-      "times": [
-        {
-          "time": "10:00",
-          "events": [
-            {
-              "title": "Hochzeit Eduard & Jessica",
-              "notes": "Stukenbrock"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "date": "11.10.2026",
+      "date": "25.10.2026",
       "times": [
         {
           "time": "10:00",
@@ -279,14 +40,106 @@
           "events": [
             {
               "title": "Gottesdienst",
-              "notes": "Schloss Holte - Bericht Ev. Einsatz Ostdeutschland"
+              "notes": "Schloss Holte"
             }
           ]
         }
       ]
     },
     {
-      "date": "12.10.2026",
+      "date": "26.10.2026",
+      "times": [
+        {
+          "time": "10:00",
+          "events": [
+            {
+              "title": "Gebetskreis",
+              "notes": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "28.10.2026",
+      "times": [
+        {
+          "time": "19:00",
+          "events": [
+            {
+              "title": "Gemeindestunde",
+              "notes": "Schloss Holte"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "29.10.2026",
+      "times": [
+        {
+          "time": "11:00",
+          "events": [
+            {
+              "title": "Beerdigung Helene Wiens",
+              "notes": "Schloss Holte"
+            }
+          ]
+        },
+        {
+          "time": "19:00",
+          "events": [
+            {
+              "title": "Schwesterngebetskreis",
+              "notes": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "30.10.2026",
+      "times": [
+        {
+          "time": "",
+          "events": [
+            {
+              "title": "Brüderwochenende",
+              "notes": ""
+            },
+            {
+              "title": "Fasttag",
+              "notes": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "01.11.2026",
+      "times": [
+        {
+          "time": "10:00",
+          "events": [
+            {
+              "title": "Gottesdienst",
+              "notes": "Schloss Holte & Stukenbrock"
+            }
+          ]
+        },
+        {
+          "time": "16:00",
+          "events": [
+            {
+              "title": "Abendmahl",
+              "notes": "Schloss Holte"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "02.11.2026",
       "times": [
         {
           "time": "10:00",
@@ -309,13 +162,59 @@
       ]
     },
     {
-      "date": "14.10.2026",
+      "date": "04.11.2026",
       "times": [
         {
           "time": "19:00",
           "events": [
             {
-              "title": "Elternversammlung",
+              "title": "Bibelstunde",
+              "notes": "Stukenbrock"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "06.11.2026",
+      "times": [
+        {
+          "time": "18:00",
+          "events": [
+            {
+              "title": "Gebetsstunde, Kinderstunden, Jungscharstunde",
+              "notes": ""
+            }
+          ]
+        },
+        {
+          "time": "19:45",
+          "events": [
+            {
+              "title": "Jugendstunde",
+              "notes": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "08.11.2026",
+      "times": [
+        {
+          "time": "10:00",
+          "events": [
+            {
+              "title": "Gottesdienst",
+              "notes": "Schloss Holte & Stukenbrock"
+            }
+          ]
+        },
+        {
+          "time": "16:00",
+          "events": [
+            {
+              "title": "Gottesdienst",
               "notes": "Schloss Holte"
             }
           ]
@@ -323,7 +222,44 @@
       ]
     },
     {
-      "date": "15.10.2026",
+      "date": "09.11.2026",
+      "times": [
+        {
+          "time": "10:00",
+          "events": [
+            {
+              "title": "Gebetskreis",
+              "notes": ""
+            }
+          ]
+        },
+        {
+          "time": "17:45",
+          "events": [
+            {
+              "title": "Elterngebetskreis",
+              "notes": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "11.11.2026",
+      "times": [
+        {
+          "time": "19:00",
+          "events": [
+            {
+              "title": "Bibelstunde",
+              "notes": "Stukenbrock"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "12.11.2026",
       "times": [
         {
           "time": "19:00",
@@ -335,308 +271,6 @@
           ]
         }
       ]
-    },
-    {
-  "date": "16.10.2026",
-  "times": [
-    {
-      "time": "18:00",
-      "events": [
-        {
-          "title": "Gebetsstunde, Kinderstunden, Jungscharstunde",
-          "notes": ""
-        }
-      ]
-    },
-    {
-      "time": "19:45",
-      "events": [
-        {
-          "title": "Jugendstunde",
-          "notes": ""
-        }
-      ]
     }
-  ]
-},
-{
-  "date": "17.10.2026",
-  "times": [
-    {
-      "time": "10:00",
-      "events": [
-        {
-          "title": "Missionskonferenz",
-          "notes": "Aschaffenburg"
-        }
-      ]
-    }
-  ]
-},
-{
-  "date": "18.10.2026",
-  "times": [
-    {
-      "time": "10:00",
-      "events": [
-        {
-          "title": "Gottesdienst",
-          "notes": "Schloss Holte & Stukenbrock"
-        }
-      ]
-    },
-    {
-      "time": "16:00",
-      "events": [
-        {
-          "title": "Gottesdienst",
-          "notes": "Schloss Holte - Br. Iljuscha (UA)"
-        }
-      ]
-    }
-  ]
-},
-{
-  "date": "19.10.2026",
-  "times": [
-    {
-      "time": "10:00",
-      "events": [
-        {
-          "title": "Gebetskreis",
-          "notes": ""
-        }
-      ]
-    }
-  ]
-},
-{
-  "date": "21.10.2026",
-  "times": [
-    {
-      "time": "19:00",
-      "events": [
-        {
-          "title": "Bibelstunde",
-          "notes": "Stukenbrock"
-        }
-      ]
-    }
-  ]
-},
-{
-  "date": "23.10.2026",
-  "times": [
-    {
-      "time": "18:00",
-      "events": [
-        {
-          "title": "Gebetsstunde, Kinderstunden, Jungscharstunde",
-          "notes": ""
-        }
-      ]
-    },
-    {
-      "time": "19:45",
-      "events": [
-        {
-          "title": "Jugendstunde",
-          "notes": ""
-        }
-      ]
-    }
-  ]
-},
-{
-  "date": "25.10.2026",
-  "times": [
-    {
-      "time": "10:00",
-      "events": [
-        {
-          "title": "Gottesdienst",
-          "notes": "Schloss Holte & Stukenbrock"
-        }
-      ]
-    },
-    {
-      "time": "16:00",
-      "events": [
-        {
-          "title": "Gottesdienst",
-          "notes": "Schloss Holte"
-        }
-      ]
-    }
-  ]
-},
-{
-  "date": "26.10.2026",
-  "times": [
-    {
-      "time": "10:00",
-      "events": [
-        {
-          "title": "Gebetskreis",
-          "notes": ""
-        }
-      ]
-    },
-    {
-      "time": "17:45",
-      "events": [
-        {
-          "title": "Elterngebetskreis",
-          "notes": ""
-        }
-      ]
-    }
-  ]
-},
-{
-  "date": "28.10.2026",
-  "times": [
-    {
-      "time": "19:00",
-      "events": [
-        {
-          "title": "Gemeindestunde",
-          "notes": "Schloss Holte"
-        }
-      ]
-    }
-  ]
-},
-{
-  "date": "29.10.2026",
-  "times": [
-    {
-      "time": "19:00",
-      "events": [
-        {
-          "title": "Schwesterngebetskreis",
-          "notes": ""
-        }
-      ]
-    }
-  ]
-},
-{
-  "date": "30.10.2026",
-  "times": [
-    {
-      "time": "",
-      "events": [
-        {
-          "title": "Fasttag",
-          "notes": ""
-        }
-      ]
-    },
-    {
-      "time": "18:00",
-      "events": [
-        {
-          "title": "Gebetsstunde, Kinderstunden, Jungscharstunde",
-          "notes": ""
-        }
-      ]
-    },
-    {
-      "time": "19:45",
-      "events": [
-        {
-          "title": "Jugendstunde",
-          "notes": ""
-        }
-      ]
-    }
-  ]
-},
-{
-  "date": "01.11.2026",
-  "times": [
-    {
-      "time": "10:00",
-      "events": [
-        {
-          "title": "Gottesdienst",
-          "notes": "Schloss Holte & Stukenbrock"
-        }
-      ]
-    },
-    {
-      "time": "16:00",
-      "events": [
-        {
-          "title": "Abendmahl",
-          "notes": "Schloss Holte"
-        }
-      ]
-    }
-  ]
-},
-{
-  "date": "02.11.2026",
-  "times": [
-    {
-      "time": "10:00",
-      "events": [
-        {
-          "title": "Gebetskreis",
-          "notes": ""
-        }
-      ]
-    },
-    {
-      "time": "17:45",
-      "events": [
-        {
-          "title": "Elterngebetskreis",
-          "notes": ""
-        }
-      ]
-    }
-  ]
-},
-{
-  "date": "04.11.2026",
-  "times": [
-    {
-      "time": "19:00",
-      "events": [
-        {
-          "title": "Bibelstunde",
-          "notes": "Stukenbrock"
-        }
-      ]
-    }
-  ]
-},
-{
-  "date": "06.11.2026",
-  "times": [
-    {
-      "time": "18:00",
-      "events": [
-        {
-          "title": "Gebetsstunde, Kinderstunden, Jungscharstunde",
-          "notes": ""
-        }
-      ]
-    },
-    {
-      "time": "19:45",
-      "events": [
-        {
-          "title": "Jugendstunde",
-          "notes": ""
-        }
-      ]
-    }
-  ]
-}
-    
-    
   ]
 }
