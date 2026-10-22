@@ -114,8 +114,9 @@
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         // URL der JSON-Datei für die Terminübersicht
-        const jsonUrl = "https://macdeveloping.github.io/1NF0P01N7/termine.json";
-
+        //const jsonUrl = "https://macdeveloping.github.io/1NF0P01N7/termine.json";
+        const jsonUrl = "http://192.168.179.43:8008/termine?auth=1nf0p01n7";
+        
         // Für Tests hier optional Roh-JSON eintragen.
         let jsonTestData = '';
         const refreshInterval = 0.1; // Minuten; 0 deaktiviert den automatischen Reload
