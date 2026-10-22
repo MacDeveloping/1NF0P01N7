@@ -104,11 +104,25 @@
           "time": "",
           "events": [
             {
-              "title": "Brüderwochenende",
+              "title": "Fasttag",
               "notes": ""
             },
             {
-              "title": "Fasttag",
+              "title": "Brüderwochenende",
+              "notes": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "31.10.2026",
+      "times": [
+        {
+          "time": "",
+          "events": [
+            {
+              "title": "Brüderwochenende",
               "notes": ""
             }
           ]
