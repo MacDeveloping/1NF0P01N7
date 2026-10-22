@@ -1,0 +1,350 @@
+<!--<html class="rootHTML"> -->
+<!--lang="de"  -->
+<div id="container-years" class="rootHTMLersatz">
+    <div id="yearbox" class="yearbox">
+
+        <!-- Oben: Oktober -->
+        <p id="month" class="month">Oktober</p>
+
+        <!-- Darunter: Verschiedene Termine -->
+        <div id="container-names" class="container-events">
+            <div id="event" class="event">
+                <p id="date" class="date">11.10.</p>
+                <p id="name" class="name">Vorname Nachname</p>
+                <p id="description" class="description"></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<style>
+    /*Xibo Widget CSS*/
+    :root {
+        /*Farben*/
+        --backround-color: #dec5ad;
+        --primary-text-color: black;
+        /*Schrift*/
+        --textgroeße-jahr: 35px;
+        --textgroeße-datum: 33px;
+        --textgroeße-title: 35px;
+        --textgroeße-beschreibung: 25px;
+        --textart-default-text: Poppins, Calibri, Arial;
+        /*Abstaende und Groeßen*/
+        --daybox-ecke-radius: 40px;
+        --daybox-padding: 25px;
+        --abstand-naechste-daybox: 25px;
+        --abstand-year-zu-events: 0px;
+        --abstand-event-zu-event: 10px;
+        --abstand-titel-zu-datum: -5px;
+        --abstand-beschreibung-zu-titel: -5px;
+    }
+
+    .rootHTMLersatz {
+        font-size: var(--primary-textgroeße);
+    }
+
+    .yearbox {
+        /*Box Layout*/
+        background-color: var(--backround-color);
+        /*Schriftart*/
+        text-align: left;
+        font-family: var(--textart-default-text);
+        color: var(--primary-text-color);
+        /*Abstaende innerhalb*/
+        /*Einzeln festlegen:
+    padding-top: 20px;
+    padding-left: 20px;
+    padding-bottom: 20px;
+    padding-right: 20px;
+    */
+        padding: var(--daybox-padding);
+        border-radius: var(--daybox-ecke-radius);
+        /*Abstand unten zur naechsten Box*/
+        margin-bottom: var(--abstand-naechste-daybox);
+        /*Anordnung der Elemente innerhalb*/
+        display: flex;
+        flex-direction: column;
+        flex-wrap: nowrap;
+        align-items: flex-start;
+    }
+
+    /* Jahr - Fettformatierung */
+    .year {
+        font-weight: bold;
+        margin: 0px;
+        margin-bottom: var(--abstand-year-zu-events);
+        font-size: var(--textgroeße-jahr);
+    }
+
+
+    /* Container mit Datum, Titel und Beschreibung */
+    .event {
+        display: flex;
+        flex-direction: column;
+        flex-wrap: nowrap;
+        align-items: flex-start;
+        hyphens: auto;
+    }
+
+
+    .date {
+        margin-top: var(--abstand-event-zu-event);
+        margin-bottom: 0px;
+        font-size: var(--textgroeße-datum);
+    }
+
+    .title {
+        margin-top: var(--abstand-titel-zu-datum);
+        margin-bottom: 0px;
+        font-size: var(--textgroeße-title);
+    }
+
+
+    .description {
+        margin: 0px;
+        margin-top: var(--abstand-beschreibung-zu-titel);
+        margin-bottom: 0px;
+        font-size: var(--textgroeße-beschreibung);
+    }
+</style>
+
+
+<!--Xibo Widget Head-->
+<!--<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // URL der JSON-Datei für die Terminübersicht
+        //const jsonUrl = "https://macdeveloping.github.io/1NF0P01N7/termine.json";
+        const jsonUrl = "";
+
+        // Für Tests hier optional Roh-JSON eintragen.
+        let jsonTestData = '';
+        const refreshInterval = 0.1; // Minuten; 0 deaktiviert den automatischen Reload
+
+        const containerYears = document.getElementById("container-years");
+        const originalYearbox = containerYears.querySelector(".yearbox");
+        const originalEvent = originalYearbox.querySelector(".event");
+
+        if (!containerYears || !originalYearbox || !originalEvent) {
+            console.error("Terminvorlage nicht gefunden.");
+            return;
+        }
+
+        // Vorlagen merken und die ursprüngliche Beispiel-Box ausblenden/entfernen.
+        const originalYearboxTemplate = originalYearbox.cloneNode(true);
+        const originalEventTemplate = originalEvent.cloneNode(true);
+        originalYearbox.remove();
+
+        let lastData = null;
+        let refreshTimerId = null;
+
+        // Erwartetes Datumsformat der JSON: TT.MM.JJJJ
+        function parseGermanDate(value) {
+            if (typeof value !== "string") return null;
+            const match = value.trim().match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/);
+            if (!match) return null;
+
+            const day = Number(match[1]);
+            const month = Number(match[2]);
+            const year = Number(match[3]);
+            const date = new Date(year, month - 1, day);
+
+            // Ungültige Daten wie 31.02.2026 abfangen.
+            if (date.getFullYear() !== year ||
+                date.getMonth() !== month - 1 ||
+                date.getDate() !== day) return null;
+
+            return date;
+        }
+
+        const germanMonths = [
+            "Januar", "Februar", "März", "April", "Mai", "Juni",
+            "Juli", "August", "September", "Oktober", "November", "Dezember"
+        ];
+        const shortMonths = [
+            "Jan", "Feb", "Mär", "Apr", "Mai", "Jun",
+            "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"
+        ];
+
+        function dayNumber(date) {
+            return String(date.getDate()).padStart(2, "0");
+        }
+
+        // Datum ohne Jahr für cluster_mode "year".
+        function formatDateYearMode(start, end) {
+            if (start.getTime() === end.getTime()) {
+                return `${dayNumber(start)}. ${germanMonths[start.getMonth()]}`;
+            }
+
+            if (start.getMonth() === end.getMonth() &&
+                start.getFullYear() === end.getFullYear()) {
+                return `${dayNumber(start)}.-${dayNumber(end)}. ${germanMonths[end.getMonth()]}`;
+            }
+
+            return `${dayNumber(start)}. ${shortMonths[start.getMonth()]} - ${dayNumber(end)}. ${shortMonths[end.getMonth()]}`;
+        }
+
+        // Datum mit Jahr für cluster_mode "event"; das Jahr stammt vom Enddatum.
+        function formatDateEventMode(start, end) {
+            const year = end.getFullYear();
+
+            if (start.getTime() === end.getTime()) {
+                return `${dayNumber(start)}. ${germanMonths[start.getMonth()]} ${year}`;
+            }
+
+            if (start.getMonth() === end.getMonth() &&
+                start.getFullYear() === end.getFullYear()) {
+                return `${dayNumber(start)}.-${dayNumber(end)}. ${germanMonths[end.getMonth()]} ${year}`;
+            }
+
+            return `${dayNumber(start)}. ${shortMonths[start.getMonth()]} - ${dayNumber(end)}. ${shortMonths[end.getMonth()]} ${year}`;
+        }
+
+        async function loadJson() {
+            if (jsonTestData && jsonTestData.trim() !== "") {
+                try {
+                    return JSON.parse(jsonTestData);
+                } catch (e) {
+                    console.error("jsonTestData kann nicht geparst werden:", e);
+                    return null;
+                }
+            }
+
+            try {
+                const response = await fetch(jsonUrl, { cache: "no-store" });
+                if (!response.ok) throw new Error("HTTP " + response.status);
+                return await response.json();
+            } catch (e) {
+                console.error("Fehler beim Laden der Termin-JSON:", e);
+                return null;
+            }
+        }
+
+        function makeEvent(eventData, mode) {
+            const eventBox = originalEventTemplate.cloneNode(true);
+            eventBox.querySelectorAll("[id]").forEach(el => el.removeAttribute("id"));
+
+            const dateEl = eventBox.querySelector(".date");
+            const titleEl = eventBox.querySelector(".title");
+            const descriptionEl = eventBox.querySelector(".description");
+
+            const start = parseGermanDate(eventData.date_start);
+            const end = parseGermanDate(eventData.date_end);
+
+            if (dateEl) {
+                if (start && end) {
+                    dateEl.textContent = mode === "event"
+                        ? formatDateEventMode(start, end)
+                        : formatDateYearMode(start, end);
+                } else {
+                    dateEl.textContent = "Ungültiges Datum";
+                    console.warn("Ungültiges date_start/date_end bei Termin:", eventData);
+                }
+            }
+
+            if (titleEl) titleEl.textContent = eventData.title || "";
+            if (descriptionEl) descriptionEl.textContent = eventData.notes || "";
+
+            return eventBox;
+        }
+
+        function makeYearbox(year, events, mode) {
+            const yearbox = originalYearboxTemplate.cloneNode(true);
+            yearbox.querySelectorAll("[id]").forEach(el => el.removeAttribute("id"));
+
+            const yearEl = yearbox.querySelector(".year");
+            const eventContainers = yearbox.querySelectorAll(".container-events");
+            const eventsContainer = eventContainers[0];
+
+            // Nur einen container-events pro yearbox verwenden.
+            eventContainers.forEach((element, index) => {
+                if (index > 0) element.remove();
+            });
+
+            if (yearEl) {
+                if (mode === "event") {
+                    yearEl.remove();
+                } else {
+                    yearEl.textContent = String(year);
+                }
+            }
+
+            if (eventsContainer) {
+                eventsContainer.innerHTML = "";
+                events.forEach(eventData => {
+                    eventsContainer.appendChild(makeEvent(eventData, mode));
+                });
+            }
+
+            return yearbox;
+        }
+
+        function renderFromData(data) {
+            if (!data || !Array.isArray(data.events)) {
+                console.error('Die JSON muss ein Array "events" enthalten.');
+                return;
+            }
+
+            const mode = data.cluster_mode === "event" ? "event" : "year";
+            containerYears.innerHTML = "";
+
+            const validEvents = data.events.map(eventData => {
+                const start = parseGermanDate(eventData.date_start);
+                const end = parseGermanDate(eventData.date_end);
+                return { eventData, start, end };
+            }).filter(item => {
+                if (!item.start || !item.end) {
+                    console.warn("Termin wegen ungültigem Datum übersprungen:", item.eventData);
+                    return false;
+                }
+                if (item.end < item.start) {
+                    console.warn("Termin mit Enddatum vor Startdatum übersprungen:", item.eventData);
+                    return false;
+                }
+                return true;
+            });
+
+            // Chronologisch sortieren, bei gleichem Startdatum Reihenfolge beibehalten.
+            validEvents.sort((a, b) => a.start - b.start);
+
+            if (mode === "event") {
+                validEvents.forEach(item => {
+                    containerYears.appendChild(makeYearbox(
+                        item.end.getFullYear(),
+                        [item.eventData],
+                        "event"
+                    ));
+                });
+            } else {
+                const groups = new Map();
+                validEvents.forEach(item => {
+                    const year = item.start.getFullYear();
+                    if (!groups.has(year)) groups.set(year, []);
+                    groups.get(year).push(item.eventData);
+                });
+
+                Array.from(groups.keys()).sort((a, b) => a - b).forEach(year => {
+                    containerYears.appendChild(makeYearbox(year, groups.get(year), "year"));
+                });
+            }
+        }
+
+        async function loadAndRender() {
+            const data = await loadJson();
+            if (data) {
+                lastData = data;
+                renderFromData(data);
+            } else if (lastData) {
+                console.warn("Ladefehler: Die letzte erfolgreiche Anzeige bleibt bestehen.");
+            } else {
+                console.error("Keine Termindaten zum Anzeigen verfügbar.");
+            }
+        }
+
+        loadAndRender();
+
+        if (refreshInterval && Number(refreshInterval) > 0) {
+            refreshTimerId = setInterval(loadAndRender, Number(refreshInterval) * 60 * 1000);
+        }
+    });
+</script>

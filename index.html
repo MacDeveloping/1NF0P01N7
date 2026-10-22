@@ -150,11 +150,12 @@
         // Konfiguration
         // Wenn jsonTestData ein leerer String ist, wird die JSON per URL geladen.
         // Ansonsten wird der Inhalt von jsonTestData benutzt (Roh-JSON).
-        const jsonUrl = "http://192.168.179.43:8008/wochenuebersicht?auth=1nf0p01n7";
+        //const jsonUrl = "http://192.168.179.43:8008/wochenuebersicht?auth=1nf0p01n7";
+        const jsonUrl = "https://macdeveloping.github.io/1NF0P01N7/wochenuebersicht.json";
 
         // hier für Tests Rohdaten einfügen
         let jsonTestData = '';
-        const showDaysCount = 0; // wie viele Tage geprüft werden (wenn >0 gilt dieser Wert)
+        const showDaysCount = 11; // wie viele Tage geprüft werden (wenn >0 gilt dieser Wert)
         // Schwellwert (Wochentag 0=Sonntag,1=Montag..6=Samstag).
         // Ab diesem Wochentag wird bis zum übernächsten Sonntag angezeigt.
         const showNextSundayFrom = 5; // z.B. 5 = ab Freitag erweitern bis übernächsten Sonntag

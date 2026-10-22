@@ -2,4 +2,4 @@ port = 8008
 url_wochenuebersicht = "webcal://p150-caldav.icloud.com/published/2/MTY3NzY0NjYzNTAxNjc3Nqu3gRJSSyusenXaHs1S8wAaM85I_o347Upo2DZpM4t9pW9DZpA-DST2Kw3I-RFHeXTzd-kOnZQRpATfZ04Xrrg"
 url_termine = "webcal://p150-caldav.icloud.com/published/2/MTY3NzY0NjYzNTAxNjc3Nqu3gRJSSyusenXaHs1S8wD_N_7HhMqZ8UXeuFvSs_Jps-4CBDrd0bPXSCTCsPCXdT8E8a0-FtfsO5G9vdJbxxw"
 auth = "1nf0p01n7"
-cluster_mode = "event"
+cluster_mode = "year"
