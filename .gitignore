@@ -12,6 +12,9 @@
 ._*.py
 .DS_Store
 
+#explizite Dateiordner
+archiv/
+
 #extraDatei
 wochenuebersicht.json
 

@@ -17,6 +17,8 @@ from __future__ import annotations
 import hmac
 import json
 import logging
+import re
+import threading
 try:
     import tomllib
 except ModuleNotFoundError:
@@ -43,8 +45,10 @@ except ImportError as exc:
 
 BASE_DIR = Path(__file__).resolve().parent
 CONFIG_PATH = BASE_DIR / "infopoint-server.toml"
+ARCHIVE_DIR = BASE_DIR / "archiv"
 BERLIN = ZoneInfo("Europe/Berlin")
 LOG = logging.getLogger("infopoint-server")
+ARCHIVE_LOCK = threading.Lock()
 
 
 def load_config() -> dict:
@@ -119,8 +123,12 @@ def as_berlin_datetime(value) -> datetime:
     raise ValueError(f"Nicht unterstützter DTSTART-Wert: {value!r}")
 
 
-def parse_wochenuebersicht(calendar: Calendar) -> dict:
-    """Erzeugt die JSON-Struktur für die kommenden drei Wochen.
+def parse_wochenuebersicht(
+    calendar: Calendar,
+    range_start: date | None = None,
+    range_end: date | None = None,
+) -> dict:
+    """Erzeugt die JSON-Struktur für den gewünschten Zeitraum.
 
     Wiederholungen werden mit recurring-ical-events expandiert. Dadurch
     werden EXDATE, RECURRENCE-ID und geänderte/gelöschte Einzeltermine
@@ -131,9 +139,14 @@ def parse_wochenuebersicht(calendar: Calendar) -> dict:
     Titel die Sonderreihenfolge Erststunde, Oberstunden, Unterstunde.
     """
     today = datetime.now(BERLIN).date()
-    start = datetime.combine(today, time.min, tzinfo=BERLIN)
-    end_date = today + timedelta(days=21)
-    end = datetime.combine(end_date, time.min, tzinfo=BERLIN)
+    start_date = range_start or today
+    end_date = range_end or (today + timedelta(days=21))
+    start = datetime.combine(start_date, time.min, tzinfo=BERLIN)
+    end = datetime.combine(
+        end_date + (timedelta(days=1) if range_end is not None else timedelta()),
+        time.min,
+        tzinfo=BERLIN,
+    )
 
     # Die Bibliothek verarbeitet Serien und Ausnahmen, bevor wir die
     # ausgegebenen Instanzen in die gewünschte JSON-Struktur überführen.
@@ -154,7 +167,7 @@ def parse_wochenuebersicht(calendar: Calendar) -> dict:
         local_start = as_berlin_datetime(raw_start)
 
         event_date = local_start.date()
-        if not (today <= event_date <= end_date):
+        if not (start_date <= event_date <= end_date):
             continue
 
         event_time = "" if is_all_day else local_start.strftime("%H:%M")
@@ -198,8 +211,13 @@ def parse_wochenuebersicht(calendar: Calendar) -> dict:
 
 
 
-def parse_termine(calendar: Calendar, cluster_mode: str) -> dict:
-    """Parst zukünftige Einzeltermine in die JSON-Struktur für /termine.
+def parse_termine(
+    calendar: Calendar,
+    cluster_mode: str,
+    range_start: date | None = None,
+    range_end: date | None = None,
+) -> dict:
+    """Parst Einzeltermine in die JSON-Struktur für /termine.
 
     Wiederkehrende Serien werden nicht expandiert.
     Ganztägige iCalendar-Termine verwenden bei DTEND normalerweise
@@ -256,8 +274,12 @@ def parse_termine(calendar: Calendar, cluster_mode: str) -> dict:
         else:
             end_date = start_date
 
-        # Nur Termine, die heute oder später beginnen, ausgeben.
-        if start_date < today:
+        if range_start is None or range_end is None:
+            # Beim normalen Endpunkt nur zukünftige Termine ausgeben.
+            if start_date < today:
+                continue
+        elif end_date < range_start or start_date > range_end:
+            # Archivabfragen berücksichtigen Termine, die den Zeitraum schneiden.
             continue
 
         events.append({
@@ -277,6 +299,102 @@ def parse_termine(calendar: Calendar, cluster_mode: str) -> dict:
         "cluster_mode": cluster_mode,
         "events": events,
     }
+
+
+def archive_response(kind: str, payload: dict) -> None:
+    """Speichert die Antwort eines Endpunkts einmal pro Kalendertag."""
+    now = datetime.now(BERLIN)
+    archive_path = ARCHIVE_DIR / kind
+    archive_path.mkdir(parents=True, exist_ok=True)
+
+    date_prefix = now.strftime("%Y-%m-%d_")
+    filename = (
+        f"{now:%Y-%m-%d}_KW{now.isocalendar().week:02d}_"
+        f"{now:%H-%M-%S}_{kind}.json"
+    )
+
+    with ARCHIVE_LOCK:
+        for old_file in archive_path.glob(f"{date_prefix}*_{kind}.json"):
+            old_file.unlink()
+
+        temporary_path = archive_path / f".{filename}.tmp"
+        temporary_path.write_text(
+            json.dumps(payload, ensure_ascii=False, indent=2),
+            encoding="utf-8",
+        )
+        temporary_path.replace(archive_path / filename)
+
+
+def parse_archive_period(value: str) -> tuple[date, date] | None:
+    """Parst JJJJ oder JJJJ-JJJJ in einen inklusiven Datumsbereich."""
+    match = re.fullmatch(r"(\d{4})(?:-(\d{4}))?", value)
+    if not match:
+        return None
+
+    start_year = int(match.group(1))
+    end_year = int(match.group(2) or match.group(1))
+    if start_year > end_year:
+        return None
+    return date(start_year, 1, 1), date(end_year, 12, 31)
+
+
+def archive_files(kind: str):
+    return sorted((ARCHIVE_DIR / kind).glob(f"*_{kind}.json"))
+
+
+def load_archived_data(kind: str, period: tuple[date, date]) -> dict:
+    """Lädt und aggregiert Archivdaten des gewünschten Endpunkts."""
+    start_date, end_date = period
+
+    if kind == "termine":
+        events_by_key = {}
+        for archive_file in archive_files(kind):
+            try:
+                payload = json.loads(archive_file.read_text(encoding="utf-8"))
+            except (OSError, json.JSONDecodeError) as exc:
+                LOG.warning("Archivdatei %s konnte nicht gelesen werden: %s", archive_file, exc)
+                continue
+
+            for event in payload.get("events", []):
+                try:
+                    event_start = datetime.strptime(
+                        event["date_start"], "%d.%m.%Y"
+                    ).date()
+                    event_end = datetime.strptime(
+                        event["date_end"], "%d.%m.%Y"
+                    ).date()
+                except (KeyError, TypeError, ValueError):
+                    continue
+
+                if event_end < start_date or event_start > end_date:
+                    continue
+                key = json.dumps(event, ensure_ascii=False, sort_keys=True)
+                events_by_key[key] = event
+
+        events = list(events_by_key.values())
+        events.sort(key=lambda event: (
+            datetime.strptime(event["date_start"], "%d.%m.%Y").date(),
+            event.get("title", "").casefold(),
+        ))
+        return {"cluster_mode": "year", "events": events}
+
+    days_by_date = {}
+    for archive_file in archive_files(kind):
+        try:
+            payload = json.loads(archive_file.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            LOG.warning("Archivdatei %s konnte nicht gelesen werden: %s", archive_file, exc)
+            continue
+
+        for day in payload.get("days", []):
+            try:
+                event_date = datetime.strptime(day["date"], "%d.%m.%Y").date()
+            except (KeyError, TypeError, ValueError):
+                continue
+            if start_date <= event_date <= end_date:
+                days_by_date[event_date] = day
+
+    return {"days": [days_by_date[key] for key in sorted(days_by_date)]}
 
 
 
@@ -320,10 +438,41 @@ class InfopointRequestHandler(BaseHTTPRequestHandler):
         route = parsed_url.path.rstrip("/") or "/"
 
         try:
-            if route == "/wochenuebersicht":
+            archive_parts = route.strip("/").split("/")
+            if (
+                len(archive_parts) == 3
+                and archive_parts[0] == "archiv"
+                and archive_parts[1] in ("wochenuebersicht", "termine")
+            ):
+                period = parse_archive_period(archive_parts[2])
+                if period is None:
+                    self.send_json(404, {"error": "Ungültiger Archivzeitraum"})
+                    return
+
+                range_start, range_end = period
+                if archive_parts[1] == "wochenuebersicht":
+                    calendar = fetch_calendar(
+                        self.server.config["url_wochenuebersicht"]
+                    )
+                    result = parse_wochenuebersicht(
+                        calendar,
+                        range_start,
+                        range_end,
+                    )
+                else:
+                    calendar = fetch_calendar(self.server.config["url_termine"])
+                    result = parse_termine(
+                        calendar,
+                        "year",
+                        range_start,
+                        range_end,
+                    )
+                self.send_json(200, result)
+            elif route == "/wochenuebersicht":
                 calendar = fetch_calendar(self.server.config["url_wochenuebersicht"])
                 result = parse_wochenuebersicht(calendar)
                 self.send_json(200, result)
+                archive_response("wochenuebersicht", result)
             elif route == "/termine":
                 calendar = fetch_calendar(self.server.config["url_termine"])
                 result = parse_termine(
@@ -331,6 +480,7 @@ class InfopointRequestHandler(BaseHTTPRequestHandler):
                     self.server.config["cluster_mode"],
                 )
                 self.send_json(200, result)
+                archive_response("termine", result)
             else:
                 self.send_json(404, {"error": "Endpunkt nicht gefunden"})
         except (HTTPError, URLError, TimeoutError, OSError, ValueError) as exc:
