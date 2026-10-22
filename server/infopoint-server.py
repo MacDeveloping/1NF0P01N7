@@ -44,7 +44,7 @@ except ImportError as exc:
 
 
 BASE_DIR = Path(__file__).resolve().parent
-CONFIG_PATH = BASE_DIR / "infopoint-server.toml"
+CONFIG_PATH = BASE_DIR / "config.toml"
 ARCHIVE_DIR = BASE_DIR / "archiv"
 BERLIN = ZoneInfo("Europe/Berlin")
 LOG = logging.getLogger("infopoint-server")
